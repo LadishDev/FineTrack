@@ -1,12 +1,14 @@
-import { Bell, Shield, Smartphone, RefreshCw, Wifi, WifiOff, Bug } from 'lucide-react';
+import { Bell, Shield, Smartphone, RefreshCw, Wifi, WifiOff, Bug, Lightbulb, Coffee } from 'lucide-react';
 
 interface SettingsProps {
   onSync?: () => Promise<void>;
   isOnline?: boolean;
   onReportBug?: () => void;
+  onSuggestion?: () => void;
+  onDonation?: () => void;
 }
 
-export default function Settings({ onSync, isOnline = false, onReportBug }: SettingsProps) {
+export default function Settings({ onSync, isOnline = false, onReportBug, onSuggestion, onDonation }: SettingsProps) {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
@@ -125,7 +127,7 @@ export default function Settings({ onSync, isOnline = false, onReportBug }: Sett
         <div className="space-y-4">
           <div className="space-y-2 text-sm text-gray-600">
             <p>FineTrack helps you manage all your vehicle-related fines and charges in one place.</p>
-            <p>Version: 1.0.0</p>
+            <p>Version: 1.0.0 | Made By @LadishDev</p>
             <p>This is a Progressive Web App - you can install it on your device for a native app experience.</p>
           </div>
           
@@ -137,6 +139,28 @@ export default function Settings({ onSync, isOnline = false, onReportBug }: Sett
               >
                 <Bug className="h-4 w-4" />
                 Report a Bug
+              </button>
+            </div>
+          )}
+          {onSuggestion && (
+            <div className="pt-4 border-t border-gray-200">
+              <button
+                onClick={onSuggestion}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+              >
+                <Lightbulb className="h-4 w-4" />
+                Suggest a Feature
+              </button>
+            </div>
+          )}
+          {onDonation && (
+            <div className="pt-4 border-t border-gray-200">
+              <button
+                onClick={onDonation}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors"
+              >
+                <Coffee className="h-4 w-4" />
+                Support Development! Buy me a coffee
               </button>
             </div>
           )}

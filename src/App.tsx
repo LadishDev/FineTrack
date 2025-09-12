@@ -6,6 +6,7 @@ import FineList from './components/FineList';
 import Settings from './components/Settings';
 import LinksPage from './components/LinksPage';
 import ReportBug from './components/ReportBug';
+import SuggestFeature from './components/SuggestFeature';
 import { Fine } from './types';
 import { useStorage } from './hooks/useStorage';
 
@@ -39,7 +40,8 @@ function App() {
       'add': 'add',
       'list': 'list',
       'settings': 'settings',
-      'report-bug': 'report-bug'
+      'report-bug': 'report-bug',
+      'add-suggestion': 'add-suggestion',
     };
     return { view: map[p] || 'dashboard', category: null };
   };
@@ -173,6 +175,14 @@ function App() {
     navigateTo('report-bug');
   };
 
+  const handleSuggestion = () => {
+    navigateTo('add-suggestion');
+  };
+
+  const handleDonation = () => {
+    window.open('https://buymeacoffee.com/ladishdev', '_blank');
+  };
+
   const handleAddFine = async (fine: Omit<Fine, 'id'>) => {
     try {
       await addFine(fine);
@@ -286,11 +296,18 @@ function App() {
                 onSync={syncData}
                 isOnline={isOnline()}
                 onReportBug={handleReportBug}
+                onSuggestion={handleSuggestion}
+                onDonation={handleDonation}
               />
             )}
             
             {currentView === 'report-bug' && (
               <ReportBug 
+                onCancel={() => navigateTo('settings')}
+              />
+            )}
+            {currentView === 'add-suggestion' && (
+              <SuggestFeature
                 onCancel={() => navigateTo('settings')}
               />
             )}
