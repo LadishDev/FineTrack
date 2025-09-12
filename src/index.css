@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Light mode (default) */
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+}
+
+/* Ensure header logo/icon remains visible in both light and dark backgrounds */
+.header-logo .car-icon {
+  color: white; /* default for contrast on colored badge */
+}
+
+@media (prefers-color-scheme: dark) {
+  .header-logo .car-icon {
+    color: white; /* icon stays white in dark mode */
+  }
+  .header-logo h1 {
+    color: white;
+    background: none;
+    -webkit-text-fill-color: white;
+  }
+}
+
+/* If the header has a very light background (e.g., in embedded dark shells), invert logo for contrast */
+.header-logo.invert .car-icon {
+  color: white;
+}
+.header-logo.invert h1 {
+  color: white;
+  background: none;
+  -webkit-text-fill-color: white;
+}
+
+/* Use mix-blend-mode as a last-resort trick for maximum contrast on various backgrounds */
+.header-logo .car-icon {
+  mix-blend-mode: normal;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Smooth transitions for better UX */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Keep form controls on a light surface for readability in all themes */
+input,
+textarea,
+select,
+button {
+  background-color: #ffffff;
+  color: #111827; /* gray-900 */
+  border: 1px solid #e6eef0; /* light subtle border */
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  box-shadow: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af; /* placeholder gray */
+}
+
+/* Ensure the light surfaces stay light even in dark mode */
+@media (prefers-color-scheme: dark) {
+  input,
+  textarea,
+  select,
+  button {
+    background-color: #ffffff;
+    color: #111827;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+}
+
+/* Small touch target increase on mobile for form fields */
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select,
+  button {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors;
+}
+
+/* Loading animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading {
+  animation: spin 1s linear infinite;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  /* Styles for when the app is installed as PWA */
+  body {
+    user-select: none; /* Prevent text selection on mobile */
+  }
+  
+  /* Hide elements that shouldn't appear in standalone mode */
+  .hide-in-pwa {
+    display: none;
+  }
+}
