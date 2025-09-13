@@ -150,6 +150,7 @@ export default function ReportBug({ onCancel }: ReportBugProps) {
         if (response.status === 400) {
           if (errorData.error?.includes('spam') || errorData.error?.includes('inappropriate')) {
             errorMessage = '⚠️ Your submission was flagged as spam or inappropriate content.\n\nPlease:\n• Use professional language\n• Provide genuine bug details\n• Avoid promotional content\n• Try rewording your description';
+            errorMessage = '⚠️ Your Bug Report was flagged as spam or inappropriate content.\n\nPlease:\n• Use professional language\n• Provide genuine bug details\n• Avoid promotional content\n• Try rewording your description';
           } else if (errorData.error?.includes('Missing required fields')) {
             errorMessage = 'Please fill in all required fields before submitting.';
           } else {
@@ -306,6 +307,7 @@ export default function ReportBug({ onCancel }: ReportBugProps) {
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">
                   Submission Error
+                  Bug Report Error
                 </h3>
                 <div className="mt-2 text-sm text-red-700 whitespace-pre-line">
                   {errorMessage}
