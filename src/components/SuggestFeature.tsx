@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Lightbulb, X, CheckCircle, Copy } from 'lucide-react';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 
 interface SuggestFeatureProps {
   onCancel: () => void;
@@ -104,7 +105,7 @@ export default function SuggestFeature({ onCancel }: SuggestFeatureProps) {
       if(hpVal) formDataToSend.append('hp', hpVal);
 
       // Only send the backend-required fields
-      const response = await fetch('/api/add-suggestion', {
+      const response = await apiRequest(API_ENDPOINTS.suggestions, {
         method: 'POST',
         body: formDataToSend
       });
@@ -170,19 +171,17 @@ export default function SuggestFeature({ onCancel }: SuggestFeatureProps) {
             <h3 className="text-lg font-bold text-green-800 mb-3">Your Suggestion ID:</h3>
             <div className="bg-white border border-green-300 rounded-md p-4 mb-4">
               <p className="text-sm text-gray-600 mb-2">Suggestion ID:</p>
-              <div className="flex items-center gap-2">
-                <div className="font-mono text-xl font-bold text-gray-900 bg-gray-50 border rounded px-3 py-2 flex-1 select-all">
-                  {suggestionId}
-                </div>
-                <button
-                  onClick={copySuggestionId}
-                  className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
-                  title="Copy Suggestion ID"
-                >
-                  <Copy className="h-4 w-4" />
-                  Copy
-                </button>
+              <div className="font-mono text-xl font-bold text-gray-900 bg-gray-50 border rounded px-3 py-2 mb-3 select-all">
+                {suggestionId}
               </div>
+              <button
+                onClick={copySuggestionId}
+                className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm w-full justify-center"
+                title="Copy Suggestion ID"
+              >
+                <Copy className="h-4 w-4" />
+                Copy Suggestion ID
+              </button>
             </div>
             <div className="text-sm text-green-700 space-y-2">
               <p className="font-semibold">📋 COPY AND SAVE THIS ID IF YOU WANT TO FOLLOW UP!</p>

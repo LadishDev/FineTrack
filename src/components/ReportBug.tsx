@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Bug, X, CheckCircle, Upload, Image, Copy } from 'lucide-react';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 
 interface ReportBugProps {
   onCancel: () => void;
@@ -132,7 +133,7 @@ export default function ReportBug({ onCancel }: ReportBugProps) {
       }
 
       // Send to backend API
-      const response = await fetch('/api/bug-reports', {
+      const response = await apiRequest(API_ENDPOINTS.bugReports, {
         method: 'POST',
         body: formDataToSend
       });
@@ -150,7 +151,6 @@ export default function ReportBug({ onCancel }: ReportBugProps) {
         if (response.status === 400) {
           if (errorData.error?.includes('spam') || errorData.error?.includes('inappropriate')) {
             errorMessage = '⚠️ Your submission was flagged as spam or inappropriate content.\n\nPlease:\n• Use professional language\n• Provide genuine bug details\n• Avoid promotional content\n• Try rewording your description';
-            errorMessage = '⚠️ Your Bug Report was flagged as spam or inappropriate content.\n\nPlease:\n• Use professional language\n• Provide genuine bug details\n• Avoid promotional content\n• Try rewording your description';
           } else if (errorData.error?.includes('Missing required fields')) {
             errorMessage = 'Please fill in all required fields before submitting.';
           } else {
@@ -233,19 +233,17 @@ export default function ReportBug({ onCancel }: ReportBugProps) {
             <h3 className="text-lg font-bold text-red-800 mb-3">⚠️ IMPORTANT - KEEP THIS SAFE!</h3>
             <div className="bg-white border border-red-300 rounded-md p-4 mb-4">
               <p className="text-sm text-gray-600 mb-2">Your Bug Report ID:</p>
-              <div className="flex items-center gap-2">
-                <div className="font-mono text-xl font-bold text-gray-900 bg-gray-50 border rounded px-3 py-2 flex-1 select-all">
-                  {bugId}
-                </div>
-                <button
-                  onClick={copyBugId}
-                  className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
-                  title="Copy Bug ID"
-                >
-                  <Copy className="h-4 w-4" />
-                  Copy
-                </button>
+              <div className="font-mono text-xl font-bold text-gray-900 bg-gray-50 border rounded px-3 py-2 mb-3 select-all">
+                {bugId}
               </div>
+              <button
+                onClick={copyBugId}
+                className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm w-full justify-center"
+                title="Copy Bug ID"
+              >
+                <Copy className="h-4 w-4" />
+                Copy Bug Report ID
+              </button>
             </div>
             <div className="text-sm text-red-700 space-y-2">
               <p className="font-semibold">📋 COPY AND SAVE THIS ID IMMEDIATELY!</p>
@@ -307,7 +305,6 @@ export default function ReportBug({ onCancel }: ReportBugProps) {
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">
                   Submission Error
-                  Bug Report Error
                 </h3>
                 <div className="mt-2 text-sm text-red-700 whitespace-pre-line">
                   {errorMessage}
