@@ -82,8 +82,8 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full h-16 bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm">
-        <nav className="w-full flex items-center justify-between px-6 h-full max-w-7xl mx-auto">
+      <header className="fixed top-0 left-0 w-full h-16 bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm" style={{ position: 'fixed', minHeight: '64px', maxHeight: '64px' }}>
+        <nav className="w-full flex items-center justify-between px-6 h-full max-w-7xl mx-auto" style={{ height: '64px', minHeight: '64px' }}>
           {/* Left side: hamburger + logo */}
           <div className="flex items-center gap-4">
             {/* Mobile Hamburger Button */}
@@ -95,9 +95,9 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
                 className="relative w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center group"
               >
                 <div className="w-5 h-4 flex flex-col justify-between">
-                  <span className={`block h-0.5 bg-gray-700 rounded-full transition-all duration-300 transform origin-center ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-                  <span className={`block h-0.5 bg-gray-700 rounded-full transition-all duration-300 transform origin-center ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
-                  <span className={`block h-0.5 bg-gray-700 rounded-full transition-all duration-300 transform origin-center ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+                  <span className={`block w-5 h-0.5 bg-gray-700 rounded-full transition-all duration-300 transform origin-center ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+                  <span className={`block w-5 h-0.5 bg-gray-700 rounded-full transition-all duration-300 transform origin-center ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
+                  <span className={`block w-5 h-0.5 bg-gray-700 rounded-full transition-all duration-300 transform origin-center ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
                 </div>
               </button>
             </div>
@@ -164,9 +164,9 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
         />
         
         {/* Menu Content */}
-        <div className={`absolute inset-x-4 top-20 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ${
+        <div className={`absolute inset-x-4 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ${
           mobileMenuOpen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95'
-        }`}>
+        }`} style={{ top: 'calc(64px + var(--status-bar-height, 0px) + 16px)' }}>
           <div className="p-6">
             <div className="grid gap-3">
               {navItems.map((item) => {
