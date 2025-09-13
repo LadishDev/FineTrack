@@ -10,6 +10,11 @@ interface FineListProps {
 }
 
 export default function FineList({ fines, onUpdateFine, onDeleteFine }: FineListProps) {
+  // Sort fines by due date (earliest first)
+  const sortedFines = [...fines].sort((a, b) => {
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  });
+
   const getTypeLabel = (type: Fine['type']) => {
     const labels = {
       speeding: 'Speeding',
@@ -88,7 +93,7 @@ export default function FineList({ fines, onUpdateFine, onDeleteFine }: FineList
         </div>
       ) : (
         <div className="space-y-4">
-          {fines.map((fine) => (
+          {sortedFines.map((fine) => (
             <div key={fine.id} className="bg-white rounded-lg shadow-md p-6">
               {editingId === fine.id ? (
                 // Edit mode - full width layout
