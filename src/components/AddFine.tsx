@@ -88,6 +88,13 @@ export default function AddFine({ onAddFine, onCancel }: AddFineProps) {
               )}
             </div>
           </div>
+
+          <button
+            onClick={onCancel}
+            className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
+          >
+            Return to Dashboard
+          </button>
         </div>
       </div>
     );
