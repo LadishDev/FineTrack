@@ -117,7 +117,6 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
             <button
               onClick={() => {
                 handleNavClick('dashboard');
-                if (onBackToDashboard) onBackToDashboard();
               }}
               aria-label="Go to dashboard"
               className="flex items-center text-gray-900 focus:outline-none rounded-md hover:bg-gray-50 px-2 py-1"
