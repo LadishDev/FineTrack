@@ -16,7 +16,7 @@ export default function AddFine({ onAddFine, onCancel }: AddFineProps) {
     description: '',
     amount: '',
     dueDate: '',
-    issueDate: '',
+    issueDate: new Date().toISOString().split('T')[0], // Default to today's date
     referenceNumber: '',
     location: '',
     vehicleReg: ''
