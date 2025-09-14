@@ -1,4 +1,5 @@
 import { Bell, Shield, Smartphone, RefreshCw, Wifi, WifiOff, Bug, Lightbulb, Coffee } from 'lucide-react';
+import { APP_VERSION } from '../version';
 
 interface SettingsProps {
   onSync?: () => Promise<void>;
@@ -127,7 +128,7 @@ export default function Settings({ onSync, isOnline = false, onReportBug, onSugg
         <div className="space-y-4">
           <div className="space-y-2 text-sm text-gray-600">
             <p>FineTrack helps you manage all your vehicle-related fines and charges in one place.</p>
-            <p>Version: 1.0.0 | Made By @LadishDev</p>
+            <p>Version: v{APP_VERSION} | Made By @LadishDev</p>
             <p>This is a Progressive Web App - you can install it on your device for a native app experience.</p>
           </div>
           
