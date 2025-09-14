@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FineTrack</string>
+    <string name="title_activity_main">FineTrack</string>
+    <string name="package_name">dev.ladish.finetrack</string>
+    <string name="custom_url_scheme">dev.ladish.finetrack</string>
+</resources>
