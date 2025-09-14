@@ -44,46 +44,6 @@ const LinksPage: React.FC<LinksPageProps> = ({
     }
   };
 
-  // Category options
-  const categoryOptions = [
-    {
-      id: 'fines',
-      title: 'Fines',
-      description: 'Parking, speeding & penalty charges',
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-300',
-    },
-    {
-      id: 'charges',
-      title: 'Charges',
-      description: 'Dartford, congestion & road charges',
-      icon: Calendar,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-300',
-    },
-    {
-      id: 'insurance',
-      title: 'Insurance',
-      description: 'Compare & manage car insurance',
-      icon: Shield,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-300',
-    },
-    {
-      id: 'mot',
-      title: 'MOT & Tax',
-      description: 'MOT tests & vehicle tax',
-      icon: CheckCircle,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-300',
-    },
-  ];
-
   // Define link categories
   const linkCategories: Record<string, LinkOption[]> = {
     fines: [
@@ -192,6 +152,50 @@ const LinksPage: React.FC<LinksPageProps> = ({
     ],
   };
 
+  // Category options
+    const categoryOptions = [
+    {
+        id: "fines",
+        title: "Fines",
+        description: "Parking, speeding & penalty charges",
+        icon: AlertTriangle,
+        color: "text-red-500",
+        borderColor: "border-red-200",
+        bgColor: "bg-red-50",
+        count: linkCategories["fines"].length,
+    },
+    {
+        id: "charges",
+        title: "Charges",
+        description: "Dartford, congestion & road charges",
+        icon: Calendar,
+        color: "text-orange-500",
+        borderColor: "border-orange-200",
+        bgColor: "bg-orange-50",
+        count: linkCategories["charges"].length,
+    },
+    {
+        id: "insurance",
+        title: "Insurance",
+        description: "Compare & manage car insurance",
+        icon: Shield,
+        color: "text-blue-500",
+        borderColor: "border-blue-200",
+        bgColor: "bg-blue-50",
+        count: linkCategories["insurance"].length,
+    },
+    {
+        id: "mot-tax",
+        title: "MOT & Tax",
+        description: "MOT tests & vehicle tax",
+        icon: CheckCircle,
+        color: "text-green-500",
+        borderColor: "border-green-200",
+        bgColor: "bg-green-50",
+        count: linkCategories["mot"].length,
+    },
+];
+
   const currentLinks = category ? linkCategories[category] || [] : [];
 
   const getCategoryTitle = (cat: string) => {
@@ -219,13 +223,15 @@ const LinksPage: React.FC<LinksPageProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
             <div className="flex items-center justify-center gap-2 text-lg font-bold">
-              <span role="img" aria-label="links">📑</span>12 Total
+            <span role="img" aria-label="links">📑</span> 
+                {Object.values(linkCategories).reduce((acc, arr) => acc + arr.length, 0)} Total
             </div>
             <div className="text-xs text-gray-300">Links</div>
           </div>
           <div>
             <div className="flex items-center justify-center gap-2 text-lg font-bold">
-              <span role="img" aria-label="categories">🗂️</span>4
+              <span role="img" aria-label="categories">🗂️</span>
+                {Object.keys(linkCategories).length} Categories
             </div>
             <div className="text-xs text-gray-300">Categories</div>
           </div>
@@ -289,7 +295,7 @@ const LinksPage: React.FC<LinksPageProps> = ({
                     <span
                         className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${option.color} bg-white bg-opacity-60`}
                     >
-                        3 links
+                        {option.count} {option.count === 1 ? "link" : "links"}
                     </span>
                     </div>
                     <p className="text-gray-600 text-sm">{option.description}</p>
