@@ -1,4 +1,4 @@
-import { Car, Settings, Plus, List, ArrowLeft } from 'lucide-react';
+import { Car, Settings, Plus, List, ArrowLeft, Link } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface HeaderProps {
@@ -15,6 +15,7 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
     { id: 'dashboard', label: 'Dashboard', icon: Car },
     { id: 'add', label: 'Add Fine', icon: Plus },
     { id: 'list', label: 'All Fines', icon: List },
+    { id: 'links', label: 'Links', icon: Link },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
