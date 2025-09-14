@@ -1,21 +1,29 @@
 {
   "name": "finetrack",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "description": "Track vehicle fines, charges, MOT, insurance and more in one place",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:sync": "npx cap sync",
+    "cap:build": "npm run build && npx cap sync",
+    "cap:android": "npx cap open android",
+    "cap:run:android": "npx cap run android"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/status-bar": "^7.0.3",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.436.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0",
-    "lucide-react": "^0.436.0",
-    "date-fns": "^3.6.0"
+    "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
