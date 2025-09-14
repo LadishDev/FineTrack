@@ -16,12 +16,45 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  
+  /* Safe area variables for status bar spacing */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  
+  /* Status bar height (typically 24px on Android) */
+  --status-bar-height: var(--safe-area-inset-top, 24px);
+}
+
+html {
+  /* Prevent overscroll on the root element */
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  height: 100%;
+  
+  /* Prevent overscroll/bounce behavior */
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  
+  /* Prevent pull-to-refresh on mobile */
+  touch-action: pan-x pan-y;
+  
+  /* Ensure content starts at proper position */
+  scroll-padding-top: 80px;
+  
+  /* Prevent any stretching or elastic behavior */
+  position: relative;
+  overflow-x: hidden;
 }
 
 /* Light mode (default) */
@@ -160,6 +193,20 @@ textarea::placeholder {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  
+  /* Extra overscroll prevention for mobile */
+  html, body {
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent pull-to-refresh and bounce */
+    touch-action: pan-x pan-y;
+  }
+  
+  /* Prevent scroll chaining on main container */
+  .min-h-screen {
+    overscroll-behavior: contain;
+  }
 }
 
 /* PWA specific styles */
@@ -167,10 +214,118 @@ textarea::placeholder {
   /* Styles for when the app is installed as PWA */
   body {
     user-select: none; /* Prevent text selection on mobile */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* App container should handle scrolling */
+  .min-h-screen {
+    height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Hide elements that shouldn't appear in standalone mode */
   .hide-in-pwa {
     display: none;
+  }
+}
+
+/* Ensure proper scroll positioning for all content */
+main {
+  scroll-margin-top: 80px;
+}
+
+/* Prevent scrolling above the top of main content */
+html, body {
+  scroll-behavior: smooth;
+}
+
+/* Force content to maintain minimum positioning */
+.container {
+  position: relative;
+  min-height: calc(100vh - 80px);
+}
+
+/* Prevent header from stretching during overscroll */
+header {
+  position: fixed !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+  top: 0 !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+/* In native apps, position header below status bar */
+html[data-capacitor] header {
+  top: var(--status-bar-height) !important;
+}
+
+/* Adjust main container for native apps */
+html[data-capacitor] .app-container {
+  /* Remove extra padding - the scroll container is already positioned correctly with top: 64px */
+  padding-top: 0 !important;
+}
+
+/* Prevent any elastic scrolling effects */
+* {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Additional overscroll prevention for Android */
+html[data-capacitor] {
+  overscroll-behavior: none !important;
+  overflow: hidden;
+  height: 100%;
+}
+
+html[data-capacitor] body {
+  overscroll-behavior: none !important;
+  overflow: hidden;
+  height: 100%;
+}
+
+html[data-capacitor] .app-container {
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+  
+  /* Hide scrollbar on mobile app */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar on mobile app - WebKit browsers */
+html[data-capacitor] .app-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Additional padding for mobile app version only */
+html[data-capacitor] main.container {
+  padding-top: 48px !important;
+  padding-bottom: 50px !important;
+}
+
+/* Dynamic viewport handling for mobile browsers with bottom UI */
+:root {
+  --browser-ui-bottom: 0px;
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Ensure footer is always visible above browser UI */
+footer {
+  margin-bottom: var(--browser-ui-bottom, 0px) !important;
+}
+
+/* Alternative approach using dvh units for better mobile support */
+@supports (height: 100dvh) {
+  .app-container {
+    bottom: 0 !important;
+    height: calc(100dvh - 64px) !important;
   }
 }
