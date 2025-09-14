@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lightbulb, X, CheckCircle, Copy } from 'lucide-react';
-import { API_ENDPOINTS, apiRequest } from '../config/api';
+import { API_ENDPOINTS, apiRequest } from '../config/api.ts';
 
 interface SuggestFeatureProps {
   onCancel: () => void;
@@ -31,16 +31,36 @@ export default function SuggestFeature({ onCancel }: SuggestFeatureProps) {
     const ua = navigator.userAgent;
     let browser = 'Unknown';
     let os = 'Unknown';
-    if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
-    else if (ua.includes('Firefox')) browser = 'Firefox';
-    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
-    else if (ua.includes('Edg')) browser = 'Edge';
-    if (ua.includes('Windows')) os = 'Windows';
-    else if (ua.includes('Mac')) os = 'macOS';
-    else if (ua.includes('Linux')) os = 'Linux';
-    else if (ua.includes('Android')) os = 'Android';
-    else if (ua.includes('iOS')) os = 'iOS';
-    return `${browser} on ${os}`;
+    
+    // Check if running in Capacitor app
+    const isCapacitor = (window as any).Capacitor !== undefined && 
+                       (window as any).Capacitor.isNativePlatform &&
+                       (window as any).Capacitor.isNativePlatform();
+    
+    if (isCapacitor) {
+      browser = 'FineTrack App';
+    } else {
+      // Detect browser for web version
+      if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
+      else if (ua.includes('Firefox')) browser = 'Firefox';
+      else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+      else if (ua.includes('Edg')) browser = 'Edge';
+    }
+    
+    // Detect OS/Platform - check mobile platforms first
+    if (ua.includes('Android')) {
+      os = 'Android';
+    } else if (ua.includes('iPhone') || ua.includes('iPad') || ua.includes('iPod')) {
+      os = 'iOS';
+    } else if (ua.includes('Windows')) {
+      os = 'Windows';
+    } else if (ua.includes('Mac')) {
+      os = 'macOS';
+    } else if (ua.includes('Linux')) {
+      os = 'Linux';
+    }
+    
+    return `${browser} - ${os}`;
   };
 
   function validateEmail(email: string){

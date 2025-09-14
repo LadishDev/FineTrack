@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Bug, X, CheckCircle, Upload, Image, Copy } from 'lucide-react';
-import { API_ENDPOINTS, apiRequest } from '../config/api';
+import { API_ENDPOINTS, apiRequest } from '../config/api.ts';
 
 interface ReportBugProps {
   onCancel: () => void;
@@ -36,20 +36,35 @@ export default function ReportBug({ onCancel }: ReportBugProps) {
     let browser = 'Unknown';
     let os = 'Unknown';
     
-    // Browser detection
-    if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
-    else if (ua.includes('Firefox')) browser = 'Firefox';
-    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
-    else if (ua.includes('Edg')) browser = 'Edge';
+    // Check if running in Capacitor app
+    const isCapacitor = (window as any).Capacitor !== undefined && 
+                       (window as any).Capacitor.isNativePlatform &&
+                       (window as any).Capacitor.isNativePlatform();
     
-    // OS detection
-    if (ua.includes('Windows')) os = 'Windows';
-    else if (ua.includes('Mac')) os = 'macOS';
-    else if (ua.includes('Linux')) os = 'Linux';
-    else if (ua.includes('Android')) os = 'Android';
-    else if (ua.includes('iOS')) os = 'iOS';
+    if (isCapacitor) {
+      browser = 'FineTrack App';
+    } else {
+      // Browser detection for web version
+      if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
+      else if (ua.includes('Firefox')) browser = 'Firefox';
+      else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+      else if (ua.includes('Edg')) browser = 'Edge';
+    }
     
-    return `${browser} on ${os}`;
+    // OS detection - check mobile platforms first
+    if (ua.includes('Android')) {
+      os = 'Android';
+    } else if (ua.includes('iPhone') || ua.includes('iPad') || ua.includes('iPod')) {
+      os = 'iOS';
+    } else if (ua.includes('Windows')) {
+      os = 'Windows';
+    } else if (ua.includes('Mac')) {
+      os = 'macOS';
+    } else if (ua.includes('Linux')) {
+      os = 'Linux';
+    }
+    
+    return `${browser} - ${os}`;
   };
 
   // Basic validators & heuristics
