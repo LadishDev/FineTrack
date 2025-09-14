@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Calendar, Shield, CheckCircle, ExternalLink, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, Calendar, Shield, CheckCircle, ExternalLink } from 'lucide-react';
 
 interface LinksPageProps {
   category?: string;
@@ -18,31 +18,33 @@ interface LinkOption {
   bgColor: string;
 }
 
-const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCategory, onNavigateToLinks, cameFromLinksPage }) => {
+const LinksPage: React.FC<LinksPageProps> = ({
+  category,
+  onBack,
+  onNavigateToCategory,
+  onNavigateToLinks,
+  cameFromLinksPage,
+}) => {
   // Handle back navigation
   const handleBack = () => {
     if (category) {
-      // If we're viewing a specific category, determine where to go back
       if (cameFromLinksPage && onNavigateToLinks) {
-        // Came from links page → go back to links category selection
         onNavigateToLinks();
       } else if (onBack) {
-        // Came from dashboard quick access → go back to dashboard
         onBack();
       } else if (onNavigateToLinks) {
-        // Fallback to links page
         onNavigateToLinks();
       } else {
         window.location.href = '/links';
       }
     } else {
-      // If we're on category selection and onBack is provided, use it
       if (onBack) {
         onBack();
       }
     }
   };
-  // Define category options (like Dashboard Quick Access)
+
+  // Category options
   const categoryOptions = [
     {
       id: 'fines',
@@ -51,7 +53,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
       icon: AlertTriangle,
       color: 'text-red-600',
       bgColor: 'bg-red-50',
-      borderColor: 'border-red-300'
+      borderColor: 'border-red-300',
     },
     {
       id: 'charges',
@@ -60,7 +62,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
       icon: Calendar,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-300'
+      borderColor: 'border-orange-300',
     },
     {
       id: 'insurance',
@@ -69,7 +71,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
       icon: Shield,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-300'
+      borderColor: 'border-blue-300',
     },
     {
       id: 'mot',
@@ -78,11 +80,11 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
-      borderColor: 'border-green-300'
-    }
+      borderColor: 'border-green-300',
+    },
   ];
 
-  // Define link categories with actual useful external sites
+  // Define link categories
   const linkCategories: Record<string, LinkOption[]> = {
     fines: [
       {
@@ -91,7 +93,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.gov.uk/pay-penalty-charge-notice',
         icon: AlertTriangle,
         color: 'text-red-600',
-        bgColor: 'bg-red-50'
+        bgColor: 'bg-red-50',
       },
       {
         title: 'Metropolitan Police - Pay PCN',
@@ -99,7 +101,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.met.police.uk/paypcn/',
         icon: AlertTriangle,
         color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        bgColor: 'bg-blue-50',
       },
       {
         title: 'DVLA - View Driving Record',
@@ -107,8 +109,8 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.gov.uk/view-driving-licence',
         icon: CheckCircle,
         color: 'text-green-600',
-        bgColor: 'bg-green-50'
-      }
+        bgColor: 'bg-green-50',
+      },
     ],
     charges: [
       {
@@ -117,7 +119,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.gov.uk/pay-dartford-crossing-charge',
         icon: Calendar,
         color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        bgColor: 'bg-blue-50',
       },
       {
         title: 'Congestion Charge',
@@ -125,7 +127,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://tfl.gov.uk/modes/driving/congestion-charge/congestion-charge-zone',
         icon: Calendar,
         color: 'text-orange-600',
-        bgColor: 'bg-orange-50'
+        bgColor: 'bg-orange-50',
       },
       {
         title: 'ULEZ',
@@ -133,8 +135,8 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://tfl.gov.uk/modes/driving/ultra-low-emission-zone',
         icon: Calendar,
         color: 'text-green-600',
-        bgColor: 'bg-green-50'
-      }
+        bgColor: 'bg-green-50',
+      },
     ],
     insurance: [
       {
@@ -143,7 +145,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.comparethemarket.com/car-insurance/',
         icon: Shield,
         color: 'text-purple-600',
-        bgColor: 'bg-purple-50'
+        bgColor: 'bg-purple-50',
       },
       {
         title: 'MoneySuperMarket',
@@ -151,7 +153,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.moneysupermarket.com/car-insurance/',
         icon: Shield,
         color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        bgColor: 'bg-blue-50',
       },
       {
         title: 'Admiral',
@@ -159,8 +161,8 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.admiral.com/',
         icon: Shield,
         color: 'text-red-600',
-        bgColor: 'bg-red-50'
-      }
+        bgColor: 'bg-red-50',
+      },
     ],
     mot: [
       {
@@ -169,7 +171,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.gov.uk/getting-an-mot',
         icon: CheckCircle,
         color: 'text-green-600',
-        bgColor: 'bg-green-50'
+        bgColor: 'bg-green-50',
       },
       {
         title: 'GOV.UK - Vehicle Tax',
@@ -177,7 +179,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://www.gov.uk/vehicle-tax',
         icon: CheckCircle,
         color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        bgColor: 'bg-blue-50',
       },
       {
         title: 'DVLA Vehicle Enquiry',
@@ -185,21 +187,19 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
         url: 'https://vehicleenquiry.service.gov.uk/',
         icon: CheckCircle,
         color: 'text-purple-600',
-        bgColor: 'bg-purple-50'
-      }
-    ]
+        bgColor: 'bg-purple-50',
+      },
+    ],
   };
 
-  // Get the appropriate links for the category
   const currentLinks = category ? linkCategories[category] || [] : [];
 
-  // Get category display name
   const getCategoryTitle = (cat: string) => {
     const titles: Record<string, string> = {
       fines: 'Fines & Penalties',
       charges: 'Road Charges',
       insurance: 'Car Insurance',
-      mot: 'MOT & Vehicle Tax'
+      mot: 'MOT & Vehicle Tax',
     };
     return titles[cat] || cat;
   };
@@ -209,57 +209,134 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          {category && (
-            <button
-              onClick={handleBack}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              <span>Back</span>
-            </button>
-          )}
-          <h2 className="text-2xl font-bold text-gray-900">
-            {category ? getCategoryTitle(category) : 'Useful Links'}
-          </h2>
+    <div className="space-y-8 max-w-4xl mx-auto px-2 md:px-0">
+      {/* Header Section */}
+      <div className="rounded-2xl shadow-lg p-6 md:p-10 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">Useful Resources</h1>
+        <p className="text-base md:text-lg text-gray-200 mb-6 max-w-2xl">
+          Access helpful government services, payment portals, and resources for managing your vehicle-related obligations. Everything you need in one convenient place.
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div>
+            <div className="flex items-center justify-center gap-2 text-lg font-bold">
+              <span role="img" aria-label="links">📑</span>12 Total
+            </div>
+            <div className="text-xs text-gray-300">Links</div>
+          </div>
+          <div>
+            <div className="flex items-center justify-center gap-2 text-lg font-bold">
+              <span role="img" aria-label="categories">🗂️</span>4
+            </div>
+            <div className="text-xs text-gray-300">Categories</div>
+          </div>
+          <div>
+            <div className="flex items-center justify-center gap-2 text-lg font-bold">
+              <span role="img" aria-label="official">🏛️</span>Official
+            </div>
+            <div className="text-xs text-gray-300">Sources</div>
+          </div>
+          <div>
+            <div className="flex items-center justify-center gap-2 text-lg font-bold">
+              <span role="img" aria-label="free">💸</span>Free
+            </div>
+            <div className="text-xs text-gray-300">Resources</div>
+          </div>
         </div>
       </div>
 
-      {!category ? (
-        /* Category Selection Grid - like Dashboard Quick Access */
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Select a Category</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Category Stats (Desktop only) */}
+      {!category && (
+        <div className="hidden md:grid grid-cols-4 gap-6">
+          {categoryOptions.map((option) => {
+            const IconComponent = option.icon;
+            return (
+              <div
+                key={option.id}
+                className={`rounded-xl p-6 flex flex-col items-center border-2 ${option.borderColor} ${option.bgColor} shadow-md`}
+              >
+                <IconComponent className={`w-8 h-8 mb-2 ${option.color}`} />
+                <div className="text-2xl font-bold mb-1 text-gray-900">3</div>
+                <div className="font-semibold text-lg mb-1 text-gray-900">{option.title}</div>
+                <div className="text-xs text-gray-600 text-center">{option.description}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Category Selection Grid */}
+        {!category && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {categoryOptions.map((option) => {
-              const IconComponent = option.icon;
+            const IconComponent = option.icon;
+            return (
+                <button
+                key={option.id}
+                onClick={() => {
+                    if (onNavigateToCategory) {
+                    onNavigateToCategory(option.id);
+                    } else {
+                    window.location.href = `/links/${option.id}`;
+                    }
+                }}
+                className={`flex flex-col md:flex-row items-center md:items-start gap-4 p-6 border-2 ${option.borderColor} ${option.bgColor} rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-[1.02] text-left group`}
+                >
+                <IconComponent className={`w-8 h-8 ${option.color}`} />
+                <div className="flex-1 w-full">
+                    {/* Title + Badge row */}
+                    <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-semibold text-lg text-gray-900">{option.title}</h3>
+                    <span
+                        className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${option.color} bg-white bg-opacity-60`}
+                    >
+                        3 links
+                    </span>
+                    </div>
+                    <p className="text-gray-600 text-sm">{option.description}</p>
+                    <p className="text-xs text-gray-500 mt-2 hidden md:block">
+                    Click to explore {option.title.toLowerCase()} resources →
+                    </p>
+                </div>
+                </button>
+            );
+            })}
+        </div>
+        )}
+
+
+      {/* All Links Preview */}
+      {!category && (
+        <div className="rounded-2xl shadow-lg p-6 bg-white text-gray-900">
+          <h2 className="text-xl font-semibold mb-4">All Available Links</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.values(linkCategories).flat().slice(0, 6).map((link, idx) => {
+              const IconComponent = link.icon;
               return (
                 <button
-                  key={option.id}
-                  onClick={() => {
-                    // Use proper navigation function if available, fallback to window.location
-                    if (onNavigateToCategory) {
-                      onNavigateToCategory(option.id);
-                    } else {
-                      window.location.href = `/links/${option.id}`;
-                    }
-                  }}
-                  className={`p-6 border-2 ${option.borderColor} ${option.bgColor} rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105 text-left group`}
+                  key={idx}
+                  onClick={() => handleLinkClick(link.url)}
+                  className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 transition-all group"
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <IconComponent className={`w-6 h-6 ${option.color}`} />
-                    <h3 className="font-semibold text-gray-900">{option.title}</h3>
+                  <IconComponent className={`w-6 h-6 ${link.color}`} />
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold text-gray-900 group-hover:underline mb-1">
+                      {link.title}
+                    </div>
+                    <div className="text-xs text-gray-600">{link.description}</div>
                   </div>
-                  <p className="text-gray-600 text-sm">{option.description}</p>
+                  <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
                 </button>
               );
             })}
           </div>
+          <div className="text-xs text-gray-500 mt-4">
+            And {Object.values(linkCategories).flat().length - 6} more links available in categories above
+          </div>
         </div>
-      ) : (
-        /* Specific Category Links */
+      )}
+
+      {/* Category Details */}
+      {category && (
         <div className="bg-white rounded-lg shadow-md p-6">
           {currentLinks.length > 0 ? (
             <>
@@ -282,9 +359,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ category, onBack, onNavigateToCat
                       <h4 className={`font-semibold ${link.color} mb-2 group-hover:underline`}>
                         {link.title}
                       </h4>
-                      <p className="text-sm text-gray-600">
-                        {link.description}
-                      </p>
+                      <p className="text-sm text-gray-600">{link.description}</p>
                     </button>
                   );
                 })}
