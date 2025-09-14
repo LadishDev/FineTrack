@@ -25,7 +25,8 @@ const LinksPage: React.FC<LinksPageProps> = ({
   onNavigateToLinks,
   cameFromLinksPage,
 }) => {
-  // Handle back navigation
+  const [searchQuery, setSearchQuery] = React.useState("");
+
   const handleBack = () => {
     if (category) {
       if (cameFromLinksPage && onNavigateToLinks) {
@@ -38,13 +39,10 @@ const LinksPage: React.FC<LinksPageProps> = ({
         window.location.href = '/links';
       }
     } else {
-      if (onBack) {
-        onBack();
-      }
+      if (onBack) onBack();
     }
   };
 
-  // Define link categories
   const linkCategories: Record<string, LinkOption[]> = {
     fines: [
       {
@@ -152,49 +150,48 @@ const LinksPage: React.FC<LinksPageProps> = ({
     ],
   };
 
-  // Category options
-    const categoryOptions = [
+  const categoryOptions = [
     {
-        id: "fines",
-        title: "Fines",
-        description: "Parking, speeding & penalty charges",
-        icon: AlertTriangle,
-        color: "text-red-500",
-        borderColor: "border-red-200",
-        bgColor: "bg-red-50",
-        count: linkCategories["fines"].length,
+      id: "fines",
+      title: "Fines",
+      description: "Parking, speeding & penalty charges",
+      icon: AlertTriangle,
+      color: "text-red-500",
+      borderColor: "border-red-200",
+      bgColor: "bg-red-50",
+      count: linkCategories["fines"].length,
     },
     {
-        id: "charges",
-        title: "Charges",
-        description: "Dartford, congestion & road charges",
-        icon: Calendar,
-        color: "text-orange-500",
-        borderColor: "border-orange-200",
-        bgColor: "bg-orange-50",
-        count: linkCategories["charges"].length,
+      id: "charges",
+      title: "Charges",
+      description: "Dartford, congestion & road charges",
+      icon: Calendar,
+      color: "text-orange-500",
+      borderColor: "border-orange-200",
+      bgColor: "bg-orange-50",
+      count: linkCategories["charges"].length,
     },
     {
-        id: "insurance",
-        title: "Insurance",
-        description: "Compare & manage car insurance",
-        icon: Shield,
-        color: "text-blue-500",
-        borderColor: "border-blue-200",
-        bgColor: "bg-blue-50",
-        count: linkCategories["insurance"].length,
+      id: "insurance",
+      title: "Insurance",
+      description: "Compare & manage car insurance",
+      icon: Shield,
+      color: "text-blue-500",
+      borderColor: "border-blue-200",
+      bgColor: "bg-blue-50",
+      count: linkCategories["insurance"].length,
     },
     {
-        id: "mot-tax",
-        title: "MOT & Tax",
-        description: "MOT tests & vehicle tax",
-        icon: CheckCircle,
-        color: "text-green-500",
-        borderColor: "border-green-200",
-        bgColor: "bg-green-50",
-        count: linkCategories["mot"].length,
+      id: "mot-tax",
+      title: "MOT & Tax",
+      description: "MOT tests & vehicle tax",
+      icon: CheckCircle,
+      color: "text-green-500",
+      borderColor: "border-green-200",
+      bgColor: "bg-green-50",
+      count: linkCategories["mot"].length,
     },
-];
+  ];
 
   const currentLinks = category ? linkCategories[category] || [] : [];
 
@@ -212,6 +209,18 @@ const LinksPage: React.FC<LinksPageProps> = ({
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const allLinks = Object.entries(linkCategories).flatMap(([cat, links]) =>
+    links.map(link => ({ ...link, category: cat }))
+  );
+
+  const filteredResults = searchQuery.trim()
+    ? allLinks.filter(link =>
+        link.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        link.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        link.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto px-2 md:px-0">
       {/* Header Section */}
@@ -223,15 +232,15 @@ const LinksPage: React.FC<LinksPageProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
             <div className="flex items-center justify-center gap-2 text-lg font-bold">
-            <span role="img" aria-label="links">📑</span> 
-                {Object.values(linkCategories).reduce((acc, arr) => acc + arr.length, 0)} Total
+              <span role="img" aria-label="links">📑</span>
+              {Object.values(linkCategories).reduce((acc, arr) => acc + arr.length, 0)} Total
             </div>
             <div className="text-xs text-gray-300">Links</div>
           </div>
           <div>
             <div className="flex items-center justify-center gap-2 text-lg font-bold">
               <span role="img" aria-label="categories">🗂️</span>
-                {Object.keys(linkCategories).length} Categories
+              {Object.keys(linkCategories).length} Categories
             </div>
             <div className="text-xs text-gray-300">Categories</div>
           </div>
@@ -261,7 +270,7 @@ const LinksPage: React.FC<LinksPageProps> = ({
                 className={`rounded-xl p-6 flex flex-col items-center border-2 ${option.borderColor} ${option.bgColor} shadow-md`}
               >
                 <IconComponent className={`w-8 h-8 mb-2 ${option.color}`} />
-                <div className="text-2xl font-bold mb-1 text-gray-900">3</div>
+                <div className="text-2xl font-bold mb-1 text-gray-900">{option.count}</div>
                 <div className="font-semibold text-lg mb-1 text-gray-900">{option.title}</div>
                 <div className="text-xs text-gray-600 text-center">{option.description}</div>
               </div>
@@ -271,75 +280,113 @@ const LinksPage: React.FC<LinksPageProps> = ({
       )}
 
       {/* Category Selection Grid */}
-        {!category && (
+      {!category && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {categoryOptions.map((option) => {
+          {categoryOptions.map((option) => {
             const IconComponent = option.icon;
             return (
-                <button
+              <button
                 key={option.id}
                 onClick={() => {
-                    if (onNavigateToCategory) {
+                  if (onNavigateToCategory) {
                     onNavigateToCategory(option.id);
-                    } else {
+                  } else {
                     window.location.href = `/links/${option.id}`;
-                    }
+                  }
                 }}
                 className={`flex flex-col md:flex-row items-center md:items-start gap-4 p-6 border-2 ${option.borderColor} ${option.bgColor} rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-[1.02] text-left group`}
-                >
+              >
                 <IconComponent className={`w-8 h-8 ${option.color}`} />
                 <div className="flex-1 w-full">
-                    {/* Title + Badge row */}
-                    <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1">
                     <h3 className="font-semibold text-lg text-gray-900">{option.title}</h3>
                     <span
-                        className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${option.color} bg-white bg-opacity-60`}
+                      className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${option.color} bg-white bg-opacity-60`}
                     >
-                        {option.count} {option.count === 1 ? "link" : "links"}
+                      {option.count} {option.count === 1 ? "link" : "links"}
                     </span>
-                    </div>
-                    <p className="text-gray-600 text-sm">{option.description}</p>
-                    <p className="text-xs text-gray-500 mt-2 hidden md:block">
-                    Click to explore {option.title.toLowerCase()} resources →
-                    </p>
-                </div>
-                </button>
-            );
-            })}
-        </div>
-        )}
-
-
-      {/* All Links Preview */}
-      {!category && (
-        <div className="rounded-2xl shadow-lg p-6 bg-white text-gray-900">
-          <h2 className="text-xl font-semibold mb-4">All Available Links</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.values(linkCategories).flat().slice(0, 6).map((link, idx) => {
-              const IconComponent = link.icon;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleLinkClick(link.url)}
-                  className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 transition-all group"
-                >
-                  <IconComponent className={`w-6 h-6 ${link.color}`} />
-                  <div className="flex-1 text-left">
-                    <div className="font-semibold text-gray-900 group-hover:underline mb-1">
-                      {link.title}
-                    </div>
-                    <div className="text-xs text-gray-600">{link.description}</div>
                   </div>
-                  <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
-                </button>
-              );
-            })}
-          </div>
-          <div className="text-xs text-gray-500 mt-4">
-            And {Object.values(linkCategories).flat().length - 6} more links available in categories above
-          </div>
+                  <p className="text-gray-600 text-sm">{option.description}</p>
+                  <p className="text-xs text-gray-500 mt-2 hidden md:block">
+                    Click to explore {option.title.toLowerCase()} resources →
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
+
+      {/* Search + All Links Preview (combined) */}
+      <div className="rounded-2xl shadow-lg p-6 bg-white text-gray-900">
+        <input
+          type="text"
+          placeholder="Search all links..."
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        {searchQuery.trim() ? (
+          <>
+            <h2 className="text-xl font-semibold mb-4">Search Results</h2>
+            {filteredResults.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredResults.map((link, idx) => {
+                  const IconComponent = link.icon;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleLinkClick(link.url)}
+                      className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 transition-all group"
+                    >
+                      <IconComponent className={`w-6 h-6 ${link.color}`} />
+                      <div className="flex-1 text-left">
+                        <div className="font-semibold text-gray-900 group-hover:underline mb-1">
+                          {link.title}
+                        </div>
+                        <div className="text-xs text-gray-600">{link.description}</div>
+                        <div className="text-xs text-gray-400 mt-1">{link.category}</div>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-8">No results found.</div>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 className="text-xl font-semibold mb-4">All Available Links</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.values(linkCategories).flat().slice(0, 6).map((link, idx) => {
+                const IconComponent = link.icon;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleLinkClick(link.url)}
+                    className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 transition-all group"
+                  >
+                    <IconComponent className={`w-6 h-6 ${link.color}`} />
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold text-gray-900 group-hover:underline mb-1">
+                        {link.title}
+                      </div>
+                      <div className="text-xs text-gray-600">{link.description}</div>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                  </button>
+                );
+              })}
+            </div>
+            <div className="text-xs text-gray-500 mt-4">
+              And {Object.values(linkCategories).flat().length - 6} more links available in categories above
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Category Details */}
       {category && (
