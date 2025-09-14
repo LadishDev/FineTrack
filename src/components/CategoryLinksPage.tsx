@@ -6,7 +6,7 @@ interface LinksPageProps {
   onBack: () => void;
 }
 
-const categoryData: Record<string, CategoryData> = {
+export const categoryData: Record<string, CategoryData> = {
   fines: {
     title: 'Fines & Penalties',
     description: 'Pay and manage your parking fines, speeding tickets, and penalty charge notices',
