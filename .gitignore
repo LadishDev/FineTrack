@@ -132,3 +132,6 @@ workbox-*.js
 
 # Local development
 .local
+
+# APK Signing Keys
+*.jks
