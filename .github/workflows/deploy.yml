@@ -24,32 +24,41 @@ jobs:
       - name: Check if version already deployed
         id: check
         run: |
-          # If gh-pages exists, check version.txt
+          SHOULD_DEPLOY=true
           if git ls-remote --exit-code origin gh-pages &> /dev/null; then
-            git fetch origin gh-pages:gh-pages  # fetch the branch locally
+            git fetch origin gh-pages:gh-pages
             if git show gh-pages:version.txt | grep -q "$VERSION"; then
               echo "This version ($VERSION) is already deployed. Skipping deploy."
-              exit 0
+              SHOULD_DEPLOY=false
             fi
           fi
-          echo "This version ($VERSION) is not deployed yet. Proceeding with deploy."
+          echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
+        if: steps.check.outputs.should_deploy == 'true'
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
 
       - name: Install dependencies
+        if: steps.check.outputs.should_deploy == 'true'
         run: npm ci
 
       - name: Build project for GitHub Pages
+        if: steps.check.outputs.should_deploy == 'true'
         run: npx vite build --base="/${{ github.repository }}/"
 
+      - name: Create 404 fallback for SPA routing
+        if: steps.check.outputs.should_deploy == 'true'
+        run: cp dist/index.html dist/404.html
+
       - name: Save version marker
+        if: steps.check.outputs.should_deploy == 'true'
         run: echo "$VERSION" > dist/version.txt
 
       - name: Deploy to GitHub Pages
+        if: steps.check.outputs.should_deploy == 'true'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
