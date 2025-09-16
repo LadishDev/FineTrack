@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy even if version exists'
+        required: false
+        default: 'false'
 
 jobs:
   build-and-deploy:
@@ -24,13 +30,18 @@ jobs:
       - name: Check if version already deployed
         id: check
         run: |
+          FORCE=${{ github.event.inputs.force_deploy || 'false' }}
           SHOULD_DEPLOY=true
-          if git ls-remote --exit-code origin gh-pages &> /dev/null; then
-            git fetch origin gh-pages:gh-pages
-            if git show gh-pages:version.txt | grep -q "$VERSION"; then
-              echo "This version ($VERSION) is already deployed. Skipping deploy."
-              SHOULD_DEPLOY=false
+          if [ "$FORCE" != "true" ]; then
+            if git ls-remote --exit-code origin gh-pages &> /dev/null; then
+              git fetch origin gh-pages:gh-pages
+              if git show gh-pages:version.txt | grep -q "$VERSION"; then
+                echo "This version ($VERSION) is already deployed. Skipping deploy."
+                SHOULD_DEPLOY=false
+              fi
             fi
+          else
+            echo "Force deploy enabled, building and deploying anyway."
           fi
           echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
 
