@@ -12,32 +12,54 @@ const updateLog: Record<string, string> = {
   // Add future version logs here
 };
 
-const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdate, previousVersion, currentVersion }) => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4">
-    <div className="bg-white text-gray-900 rounded-2xl shadow-2xl max-w-lg w-full p-8">
-      <h1 className="text-3xl font-bold mb-4">
-        {isUpdate ? 'FineTrack has been updated!' : 'Welcome To FineTrack!'}
-      </h1>
-      {isUpdate && (
-        <p className="mb-4 text-sm">
-          You previously accepted our privacy policy and terms for version{previousVersion ? ` ${previousVersion}` : ''}. Please review the latest policies and updates for version {currentVersion}.
+function compareVersions(a?: string | null, b?: string | null): number {
+  if (!a || !b) return 0;
+  const pa = a.split('.').map(Number);
+  const pb = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return 1;
+    if (na < nb) return -1;
+  }
+  return 0;
+}
+
+const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdate, previousVersion, currentVersion }) => {
+  const versionChange = compareVersions(currentVersion, previousVersion);
+  const isUpgrade = isUpdate && versionChange > 0;
+  const isDowngrade = isUpdate && versionChange < 0;
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4">
+      <div className="bg-white text-gray-900 rounded-2xl shadow-2xl max-w-lg w-full p-8">
+        <h1 className="text-3xl font-bold mb-4">
+          {isUpgrade ? 'FineTrack has been updated!' : isDowngrade ? 'FineTrack version has been downgraded!' : 'Welcome To FineTrack!'}
+        </h1>
+        {isUpgrade && (
+          <p className="mb-4 text-sm">
+            You previously accepted our privacy policy and terms for version{previousVersion ? ` ${previousVersion}` : ''}. Please review the latest policies and updates for version {currentVersion}.
+          </p>
+        )}
+        {isDowngrade && (
+          <p className="mb-4 text-sm text-red-700">
+            You previously accepted our privacy policy and terms for version{previousVersion ? ` ${previousVersion}` : ''}. You are now using an older version ({currentVersion}).
+          </p>
+        )}
+        <p className="mb-4 text-xs font-bold text-gray-700 bg-yellow-100 border-l-4 border-yellow-400 pl-3 py-2 rounded">
+          This app uses third-party services and is not affiliated with or endorsed by the UK Government. Always verify the authenticity of any website before making payments. FineTrack is not responsible for the content or accuracy of external links.
         </p>
-      )}
-      <p className="mb-4 text-xs font-bold text-gray-700 bg-yellow-100 border-l-4 border-yellow-400 pl-3 py-2 rounded">
-        This app uses third-party services and is not affiliated with or endorsed by the UK Government. Always verify the authenticity of any website before making payments. FineTrack is not responsible for the content or accuracy of external links.
-      </p>
-      {isUpdate && (
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2 text-blue-800">What’s New in {currentVersion}</h2>
-          <ul className="text-xs text-blue-900 list-disc pl-5">
-            {Object.entries(updateLog)
-              .filter(([ver]) => !previousVersion || ver > previousVersion)
-              .map(([ver, log]) => (
-                <li key={ver}><span className="font-bold">v{ver}:</span> {log}</li>
-              ))}
-          </ul>
-        </div>
-      )}
+        {isUpgrade && (
+          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h2 className="text-lg font-semibold mb-2 text-blue-800">What’s New in {currentVersion}</h2>
+            <ul className="text-xs text-blue-900 list-disc pl-5">
+              {Object.entries(updateLog)
+                .filter(([ver]) => !previousVersion || compareVersions(ver, previousVersion) > 0)
+                .map(([ver, log]) => (
+                  <li key={ver}><span className="font-bold">v{ver}:</span> {log}</li>
+                ))}
+            </ul>
+          </div>
+        )}
       <h2 className="text-xl font-semibold mt-6 mb-2">Privacy Policy</h2>
       <div className="mb-4 text-xs max-h-32 overflow-y-auto border p-2 rounded bg-gray-50">
         {/* Insert your privacy policy text here */}
@@ -64,6 +86,7 @@ const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdat
       </div>
     </div>
   </div>
-);
+    );
+  };
 
 export default PrivacyNotice;
