@@ -2,13 +2,19 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vitejs.dev/config/
+// Determine GitHub Pages base path dynamically
+const repo = process.env.GITHUB_REPOSITORY
+const repoName = repo?.split('/')[1] || ''
+const isGitHubPages = !!repoName
+const basePath = isGitHubPages ? `/${repoName}/` : '/'
+
 export default defineConfig({
+  base: basePath, // <-- dynamically set base path
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'logo_image.png'],
       manifest: {
         name: 'FineTrack - Vehicle Fine & Expense Tracker',
         short_name: 'FineTrack',
@@ -16,8 +22,8 @@ export default defineConfig({
         theme_color: '#2563eb',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: basePath,
+        start_url: basePath,
         icons: [
           {
             src: 'pwa-192x192.png',
