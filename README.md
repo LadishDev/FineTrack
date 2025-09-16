@@ -1,4 +1,14 @@
-# FineTrack
+<h1 align="center">FineTrack</h1>
+
+<p align="center">
+    <img 
+        src="./public/logo_image.png" 
+        alt="FineTrack App Logo"
+        width="250"
+        height="250"
+        />
+</p></br>
+
 
 A Progressive Web App (PWA) for tracking vehicle fines, charges, MOT, insurance and other vehicle-related expenses. Keep all your vehicle penalties and deadlines in one place with helpful payment links and notifications.
 
