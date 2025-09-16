@@ -18,20 +18,10 @@ android {
     }
     signingConfigs {
         release {
-            def storePath = System.getenv("ANDROID_KEYSTORE_PATH")
-            def storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            def keyAlias = System.getenv("ANDROID_KEY_ALIAS")
-            def keyPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            println "Keystore Path: ${storePath}"
-            println "Keystore Password: ${storePassword}"
-            println "Key Alias: ${keyAlias}"
-            println "Key Password: ${keyPassword}"
-            if (storePath && storePassword && keyAlias && keyPassword) {
-                storeFile = new File(storePath)
-                storePassword = storePassword
-                keyAlias = keyAlias
-                keyPassword = keyPassword
-            }
+            storeFile file(System.getenv("ANDROID_KEYSTORE_PATH") ?: "key.jks")
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias System.getenv("ANDROID_KEY_ALIAS")
+            keyPassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
         }
     }
     buildTypes {
