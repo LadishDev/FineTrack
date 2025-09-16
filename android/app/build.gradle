@@ -18,24 +18,39 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file(System.getenv("ANDROID_KEYSTORE_PATH"))
-            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            keyAlias System.getenv("ANDROID_KEY_ALIAS")
-            keyPassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            def storePath = System.getenv("ANDROID_KEYSTORE_PATH")
+            def storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            def keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+            def keyPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            println "Keystore Path: ${storePath}"
+            println "Keystore Password: ${storePassword}"
+            println "Key Alias: ${keyAlias}"
+            println "Key Password: ${keyPassword}"
+            if (storePath && storePassword && keyAlias && keyPassword) {
+                storeFile = new File(storePath)
+                storePassword = storePassword
+                keyAlias = keyAlias
+                keyPassword = keyPassword
+            }
         }
     }
     buildTypes {
+        debug {
+            // No signing config needed for debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            if (System.getenv("ANDROID_KEYSTORE_PATH")) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
 
 repositories {
     flatDir{
-        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    dirs 'libs'
     }
 }
 
@@ -48,7 +63,7 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
-    implementation project(':capacitor-cordova-android-plugins')
+    // Removed capacitor-cordova-android-plugins
 }
 
 apply from: 'capacitor.build.gradle'
