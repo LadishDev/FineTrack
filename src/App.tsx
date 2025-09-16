@@ -14,6 +14,9 @@ import SuggestFeature from './components/SuggestFeature';
 import { Fine } from './types';
 import { useStorage } from './hooks/useStorage';
 
+const repoName = import.meta.env.VITE_REPO_NAME || window.location.pathname.split('/')[1];
+export const BASE_PATH = repoName ? `/${repoName}/` : '/';
+
 const PRIVACY_ACCEPTED_VERSION_KEY = 'privacyAcceptedVersion';
 function App() {
   const { 
@@ -59,30 +62,35 @@ function App() {
     }
   };
   
-  // Parse the current path and extract view and optional category for shareable links pages like /links/fines
-  const parsePath = (path: string) => {
-    const p = path.replace(/^\//, '').toLowerCase();
-    // links pages can be /links or /links/category
-    if (p.startsWith('links')) {
-      const parts = p.split('/');
-      if (parts.length > 1 && parts[1]) {
-        return { view: 'links', category: decodeURIComponent(parts[1]) };
-      }
-      return { view: 'links', category: null };
-    }
+// ------------------ parsePath ------------------
+const parsePath = (path: string) => {
+  // Remove BASE_PATH from the start
+  let relativePath = path.startsWith(BASE_PATH) ? path.slice(BASE_PATH.length) : path;
+  relativePath = relativePath.replace(/^\//, '').toLowerCase();
 
-    const map: Record<string, string> = {
-      '': 'dashboard',
-      'dashboard': 'dashboard',
-      'addfine': 'add',
-      'add': 'add',
-      'list': 'list',
-      'settings': 'settings',
-      'report-bug': 'report-bug',
-      'add-suggestion': 'add-suggestion',
-    };
-    return { view: map[p] || 'dashboard', category: null };
+  // Handle links pages
+  if (relativePath.startsWith('links')) {
+    const parts = relativePath.split('/');
+    if (parts.length > 1 && parts[1]) {
+      return { view: 'links', category: decodeURIComponent(parts[1]) };
+    }
+    return { view: 'links', category: null };
+  }
+
+  // Map normal views
+  const map: Record<string, string> = {
+    '': 'dashboard',
+    'dashboard': 'dashboard',
+    'addfine': 'add',
+    'add': 'add',
+    'list': 'list',
+    'settings': 'settings',
+    'report-bug': 'report-bug',
+    'add-suggestion': 'add-suggestion',
   };
+
+  return { view: map[relativePath] || 'dashboard', category: null };
+};
 
   const initial = parsePath(window.location.pathname);
   const [currentView, setCurrentView] = useState<string>(initial.view);
@@ -99,106 +107,104 @@ function App() {
   // Ref for scroll container to save/restore scroll positions
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // navigateTo accepts optional category (used when view === 'links')
-  const navigateTo = (view: string, replace = false, category?: string | null) => {
-    // Check if this is actually a different navigation (different view OR different category)
-    const isDifferentNavigation = view !== currentView || 
-                                  (view === 'links' && category !== currentCategory);
-    
-    // Save current scroll position before navigating
-    if (scrollContainerRef.current && !replace && isDifferentNavigation) {
-      const currentScrollTop = scrollContainerRef.current.scrollTop;
-      
-      // Update the last entry in navigation history with current scroll position
-      setNavigationHistory(prev => {
-        const newHistory = [...prev];
-        if (newHistory.length > 0) {
-          newHistory[newHistory.length - 1] = {
-            ...newHistory[newHistory.length - 1],
-            scrollPosition: currentScrollTop
-          };
-        }
-        
-        // Add new entry for the destination
-        newHistory.push({ view, category, scrollPosition: 0 });
-        return newHistory;
-      });
-    }
+// ------------------ navigateTo ------------------
+const navigateTo = (view: string, replace = false, category?: string | null) => {
+  // Check if this is actually a different navigation (different view OR different category)
+  const isDifferentNavigation =
+    view !== currentView || (view === 'links' && category !== currentCategory);
 
-    // Force immediate top scroll to avoid carrying previous page scroll position into the new view
-    // (but skip this when restoring from back navigation)
-    if (typeof window !== 'undefined' && !isRestoringFromBack) {
-      try {
-        (document.activeElement as HTMLElement)?.blur();
-      } catch (e) {}
-      try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) {}
-      try { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch (e) {}
-    }
-    
-    // Reset scroll container to top (but skip when restoring from back navigation)
-    if (scrollContainerRef.current && !isRestoringFromBack) {
-      scrollContainerRef.current.scrollTop = 0;
-    }
-    
-    // update category when navigating to links, clear for other views
-    if (view === 'links') {
-      setCurrentCategory(category || null);
-    } else {
-      setCurrentCategory(null);
-    }
+  // Save current scroll position before navigating
+  if (scrollContainerRef.current && !replace && isDifferentNavigation) {
+    const currentScrollTop = scrollContainerRef.current.scrollTop;
 
-    setCurrentView(view);
+    // Update the last entry in navigation history with current scroll position
+    setNavigationHistory(prev => {
+      const newHistory = [...prev];
+      if (newHistory.length > 0) {
+        newHistory[newHistory.length - 1] = {
+          ...newHistory[newHistory.length - 1],
+          scrollPosition: currentScrollTop,
+        };
+      }
 
-    const pathMap: Record<string, string> = {
-      'dashboard': '/',
-      'add': '/addfine',
-      'list': '/list',
-      'settings': '/settings',
-      'links': category ? `/links/${encodeURIComponent(category)}` : '/links',
-      'report-bug': '/report-bug',
-      'add-suggestion': '/add-suggestion'
-    };
+      // Add new entry for the destination
+      newHistory.push({ view, category, scrollPosition: 0 });
+      return newHistory;
+    });
+  }
 
-    const to = pathMap[view] ?? (view === 'dashboard' ? '/' : '/' + view);
+  // Force immediate top scroll to avoid carrying previous page scroll position
+  if (typeof window !== 'undefined' && !isRestoringFromBack) {
     try {
-      // The pathMap already handles the category path correctly
-      let finalPath = to;
-      if (replace) window.history.replaceState(null, '', finalPath);
-      else window.history.pushState(null, '', finalPath);
-    } catch (_) {
-      // ignore (some older WebViews may restrict history)
-    }
+      (document.activeElement as HTMLElement)?.blur();
+    } catch (e) {}
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    } catch (e) {}
+    try {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    } catch (e) {}
+  }
 
-    // Ensure navigation always opens at top — handle cases where navigation is triggered outside Header
-    // (but skip this complex scroll logic when restoring from back navigation)
-    if (typeof window !== 'undefined' && !isRestoringFromBack) {
-      try {
-        // clear any existing hash that would jump to an anchor
-        if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
-      } catch (e) {
-        // ignore
-      }
+  // Reset scroll container to top
+  if (scrollContainerRef.current && !isRestoringFromBack) {
+    scrollContainerRef.current.scrollTop = 0;
+  }
 
-      try {
-        // blur any focused element that might trigger scrolling
-        (document.activeElement as HTMLElement)?.blur();
-      } catch (e) {
-        // ignore
-      }
+  // Update category for links
+  if (view === 'links') setCurrentCategory(category || null);
+  else setCurrentCategory(null);
 
-      // wait for next paint then force top-of-page scrolling (double rAF recommended)
-      requestAnimationFrame(() => requestAnimationFrame(() => {
+  // Update current view
+  setCurrentView(view);
+
+  // ------------------ URL handling with BASE_PATH ------------------
+  const pathMap: Record<string, string> = {
+    dashboard: '/',
+    add: '/addfine',
+    list: '/list',
+    settings: '/settings',
+    links: category ? `/links/${encodeURIComponent(category)}` : '/links',
+    'report-bug': '/report-bug',
+    'add-suggestion': '/add-suggestion',
+  };
+
+  const to = pathMap[view] ?? '/';
+  const finalPath = `${BASE_PATH.replace(/\/$/, '')}${to}`;
+
+  try {
+    if (replace) window.history.replaceState(null, '', finalPath);
+    else window.history.pushState(null, '', finalPath);
+  } catch (_) {}
+
+
+  // Preserve your existing scroll-to-top / header offset logic
+  if (typeof window !== 'undefined' && !isRestoringFromBack) {
+    try {
+      if (window.location.hash)
+        history.replaceState(
+          null,
+          '',
+          window.location.pathname + window.location.search
+        );
+    } catch (e) {}
+
+    try {
+      (document.activeElement as HTMLElement)?.blur();
+    } catch (e) {}
+
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
         try {
           const header = document.querySelector('header');
           const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 64;
           const main = document.querySelector('main');
-          // Prefer scrolling to the first heading inside main (title) so it's visible below the header
           let target = 0;
           if (main) {
             const firstHeading = main.querySelector('h1, h2, h3');
             if (firstHeading) {
               const elTop = (firstHeading as HTMLElement).getBoundingClientRect().top + window.scrollY;
-              // leave a small gap so the heading isn't flush against the header
               target = Math.max(0, elTop - headerH - 12);
             } else {
               const mainTop = main.getBoundingClientRect().top + window.scrollY;
@@ -210,12 +216,12 @@ function App() {
           document.documentElement.scrollTop = target;
           document.body.scrollTop = target;
           if (main) main.scrollIntoView({ behavior: 'auto', block: 'start' });
-        } catch (e) {
-          // ignore
-        }
-      }));
-    }
-  };
+        } catch (e) {}
+      })
+    );
+  }
+};
+
 
   // Navigate back and restore scroll position
   const goBack = () => {
