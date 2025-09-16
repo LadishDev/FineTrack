@@ -1,15 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
-// Determine GitHub Pages base path dynamically
-const repo = process.env.GITHUB_REPOSITORY
-const repoName = repo?.split('/')[1] || ''
-const isGitHubPages = !!repoName
-const basePath = isGitHubPages ? `/${repoName}/` : '/'
+// Determine base path based on environment
+// DEPLOY_ENV=github -> GitHub Pages
+const isGitHubPages = process.env.DEPLOY_ENV === 'github';
+const basePath = isGitHubPages ? '/FineTrack/' : '/';
 
 export default defineConfig({
-  base: basePath, // <-- dynamically set base path
+  base: basePath,
   plugins: [
     react(),
     VitePWA({
@@ -25,22 +24,9 @@ export default defineConfig({
         scope: basePath,
         start_url: basePath,
         icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
+          { src: `${basePath}pwa-192x192.png`, sizes: '192x192', type: 'image/png' },
+          { src: `${basePath}pwa-512x512.png`, sizes: '512x512', type: 'image/png' },
+          { src: `${basePath}pwa-512x512.png`, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       },
       workbox: {
@@ -52,9 +38,7 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
               networkTimeoutSeconds: 10,
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
+              cacheableResponse: { statuses: [0, 200] }
             }
           }
         ]
@@ -64,11 +48,11 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-        secure: false
+      '/api': { 
+        target: 'http://localhost:3001', 
+        changeOrigin: true, 
+        secure: false 
       }
     }
   }
-})
+});
