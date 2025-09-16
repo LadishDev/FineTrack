@@ -14,20 +14,42 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Read version
+        id: version
+        run: echo "VERSION=$(grep -oP '(?<=VERSION = \")[0-9.]+(?=\")' src/version.ts)" >> $GITHUB_ENV
+
+      - name: Check if version already deployed
+        id: check
+        run: |
+          echo "Current version: $VERSION"
+          if git ls-remote --exit-code origin gh-pages &> /dev/null; then
+            if git show origin/gh-pages:version.txt | grep -q "$VERSION"; then
+              echo "This version ($VERSION) already deployed. Skipping."
+              exit 0
+            fi
+          fi
+
       - name: Setup Node.js
+        if: success()
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
 
       - name: Install dependencies
+        if: success()
         run: npm ci
 
       - name: Build project for GitHub Pages
-        run: |
-          npx vite build --base="/${{ github.event.repository.name }}/"
+        if: success()
+        run: npx vite build --base="/${{ github.event.repository.name }}/"
+
+      - name: Save version marker
+        if: success()
+        run: echo "$VERSION" > dist/version.txt
 
       - name: Deploy to GitHub Pages
+        if: success()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
