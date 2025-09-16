@@ -1,4 +1,4 @@
-import { Car, Settings, Plus, List, ArrowLeft, Link } from 'lucide-react';
+import { Car, Settings, List, ArrowLeft, Link } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface HeaderProps {
@@ -13,7 +13,6 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Car },
-    { id: 'add', label: 'Add Fine', icon: Plus },
     { id: 'list', label: 'All Fines', icon: List },
     { id: 'links', label: 'Links', icon: Link },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -191,8 +190,8 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
                       <div className="font-medium">{item.label}</div>
                       <div className="text-sm text-gray-500">
                         {item.id === 'dashboard' && 'Overview and stats'}
-                        {item.id === 'add' && 'Record new fine'}
                         {item.id === 'list' && 'View all records'}
+                        {item.id === 'links' && 'Helpful resources'}
                         {item.id === 'settings' && 'App preferences'}
                       </div>
                     </div>

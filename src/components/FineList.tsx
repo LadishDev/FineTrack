@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Edit3, Trash2, ExternalLink } from 'lucide-react';
+import { Edit3, Trash2, ExternalLink, Plus } from 'lucide-react';
 import { format, isAfter } from 'date-fns';
 import { Fine } from '../types';
 
 interface FineListProps {
   fines: Fine[];
+  onAddFine: () => void;
   onUpdateFine: (id: string, updates: Partial<Fine>) => void;
   onDeleteFine: (id: string) => void;
 }
 
-export default function FineList({ fines, onUpdateFine, onDeleteFine }: FineListProps) {
+export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine }: FineListProps) {
   // Sort fines by due date (earliest first)
   const sortedFines = [...fines].sort((a, b) => {
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
@@ -80,10 +81,19 @@ export default function FineList({ fines, onUpdateFine, onDeleteFine }: FineList
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
+      <div>
         <h2 className="text-2xl font-bold text-gray-900">All Fines</h2>
-        <div className="text-sm text-gray-600">
-          {fines.length} total fines
+        <div className="text-sm text-gray-600 mt-1">
+        {fines.length} total fines
         </div>
+      </div>
+      <button
+        onClick={onAddFine}
+        className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        <Plus className="h-4 w-4" />
+        <span>Add Fine</span>
+      </button>
       </div>
 
       {fines.length === 0 ? (

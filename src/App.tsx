@@ -539,6 +539,7 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
             {currentView === 'list' && (
               <FineList 
                 fines={fines}
+                onAddFine={() => navigateTo('add')}
                 onUpdateFine={handleUpdateFine}
                 onDeleteFine={handleDeleteFine}
               />
