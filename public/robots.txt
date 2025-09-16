@@ -1,0 +1,5 @@
+# FineTrack - Vehicle Fine & Expense Tracker
+# Allow all search engines
+
+User-agent: *
+Disallow:
