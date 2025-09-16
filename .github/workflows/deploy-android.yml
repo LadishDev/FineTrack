@@ -1,0 +1,101 @@
+name: Build & Deploy Android Release APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/version.ts'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy even if version exists'
+        required: false
+        default: 'false'
+
+jobs:
+  build-and-deploy-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(grep -oP '(?<=VERSION = ")[0-9.]+' src/version.ts)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version detected: $VERSION"
+
+      - name: Check if version already built
+        id: check
+        run: |
+          FORCE=${{ github.event.inputs.force_deploy || 'false' }}
+          SHOULD_DEPLOY=true
+          if [ "$FORCE" != "true" ]; then
+            if [ -f android/release/FineTrack.apk ]; then
+              echo "APK already exists for this version. Skipping build."
+              SHOULD_DEPLOY=false
+            fi
+          else
+            echo "Force deploy enabled, building anyway."
+          fi
+          echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
+
+      - name: Install Node.js & dependencies
+        if: steps.check.outputs.should_deploy == 'true'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+        if: steps.check.outputs.should_deploy == 'true'
+
+      - name: Build web assets
+        if: steps.check.outputs.should_deploy == 'true'
+        run: npm run build
+
+      - name: Decode keystore from secret
+        if: steps.check.outputs.should_deploy == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/key.jks
+
+      - name: Make gradlew executable
+        if: steps.check.outputs.should_deploy == 'true'
+        run: chmod +x android/gradlew
+
+      - name: Build Android APK (release)
+        if: steps.check.outputs.should_deploy == 'true'
+        env:
+          ANDROID_KEYSTORE_PATH: app/key.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          cd android
+          ./gradlew assembleRelease
+
+      - name: Upload APK artifact
+        if: steps.check.outputs.should_deploy == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: FineTrack-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Create and push git tag for version
+        if: steps.check.outputs.should_deploy == 'true'
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
