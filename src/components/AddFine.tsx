@@ -4,10 +4,10 @@ import { Save, X, CheckCircle } from 'lucide-react';
 
 interface AddFineProps {
   onAddFine: (fine: Omit<Fine, 'id'>) => void;
-  onCancel: () => void;
+  goBack: () => void;
 }
 
-export default function AddFine({ onAddFine, onCancel }: AddFineProps) {
+export default function AddFine({ onAddFine, goBack }: AddFineProps) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [savedFine, setSavedFine] = useState<Fine | null>(null);
   const [formData, setFormData] = useState({
@@ -90,7 +90,7 @@ export default function AddFine({ onAddFine, onCancel }: AddFineProps) {
           </div>
 
           <button
-            onClick={onCancel}
+            onClick={goBack}
             className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
           >
             Return to Dashboard
@@ -106,7 +106,7 @@ export default function AddFine({ onAddFine, onCancel }: AddFineProps) {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Add New Fine</h2>
           <button
-            onClick={onCancel}
+            onClick={goBack}
             className="text-gray-400 hover:text-gray-600"
           >
             <X className="h-6 w-6" />
@@ -264,7 +264,7 @@ export default function AddFine({ onAddFine, onCancel }: AddFineProps) {
           <div className="flex justify-end space-x-4 pt-6">
             <button
               type="button"
-              onClick={onCancel}
+              onClick={goBack}
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Cancel

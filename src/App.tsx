@@ -532,7 +532,7 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
             {currentView === 'add' && (
               <AddFine 
                 onAddFine={handleAddFine}
-                onCancel={() => navigateTo('dashboard')}
+                goBack={goBack}
               />
             )}
             
