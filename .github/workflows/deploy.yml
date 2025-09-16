@@ -26,11 +26,13 @@ jobs:
         run: |
           # If gh-pages exists, check version.txt
           if git ls-remote --exit-code origin gh-pages &> /dev/null; then
-            if git show origin/gh-pages:version.txt | grep -q "$VERSION"; then
+            git fetch origin gh-pages:gh-pages  # fetch the branch locally
+            if git show gh-pages:version.txt | grep -q "$VERSION"; then
               echo "This version ($VERSION) is already deployed. Skipping deploy."
               exit 0
             fi
           fi
+          echo "This version ($VERSION) is not deployed yet. Proceeding with deploy."
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -42,7 +44,7 @@ jobs:
         run: npm ci
 
       - name: Build project for GitHub Pages
-        run: npx vite build --base="/${{ github.event.repository.name }}/"
+        run: npx vite build --base="/${{ github.repository }}/"
 
       - name: Save version marker
         run: echo "$VERSION" > dist/version.txt
