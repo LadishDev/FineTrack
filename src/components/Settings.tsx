@@ -161,7 +161,9 @@ export default function Settings({ onSync, isOnline = false, onReportBug, onSugg
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors"
               >
                 <Coffee className="h-4 w-4" />
-                Support Development! Buy me a coffee
+                Support Development!
+                <br />
+                Buy me a coffee
               </button>
             </div>
           )}
