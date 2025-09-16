@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'src/version.ts'   # Only trigger if version file changes
   workflow_dispatch:
     inputs:
       force_deploy:
@@ -60,7 +62,6 @@ jobs:
         if: steps.check.outputs.should_deploy == 'true'
         run: |
           echo "Building for GitHub Pages"
-          # Set DEPLOY_ENV so vite.config.ts uses the correct base path
           DEPLOY_ENV=github npx vite build
 
       - name: Create 404 fallback for SPA routing
