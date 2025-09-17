@@ -67,13 +67,13 @@ export const categoryData: Record<string, CategoryData> = {
           {
             title: 'Bus Lane Enforcement',
             description: 'Information about bus lane fines and appeals',
-            url: 'https://tfl.gov.uk/modes/driving/penalty-charges-notices',
+            url: 'https://tfl.gov.uk/modes/driving/red-routes/rules-of-red-routes/bus-lanes',
             type: 'information'
           },
           {
             title: 'Moving Traffic Enforcement',
             description: 'Box junction, banned turns, and moving traffic violations',
-            url: 'https://tfl.gov.uk/modes/driving/moving-traffic-enforcement',
+            url: 'https://tfl.gov.uk/modes/driving/red-routes/rules-of-red-routes',
             type: 'information'
           }
         ]
@@ -90,21 +90,9 @@ export const categoryData: Record<string, CategoryData> = {
         description: 'Dart Charge payment and account management',
         links: [
           {
-            title: 'Pay Dart Charge',
-            description: 'Pay for Dartford Crossing online',
-            url: 'https://www.dartcharge.gov.uk/PayCharge',
-            type: 'payment'
-          },
-          {
-            title: 'Set Up Dart Charge Account',
-            description: 'Create an account for automatic payments',
-            url: 'https://www.dartcharge.gov.uk/RapidReg',
-            type: 'government'
-          },
-          {
-            title: 'Dart Charge Penalty',
-            description: 'Pay penalty charge for missed payment',
-            url: 'https://www.dartcharge.gov.uk/PenaltyCharge',
+            title: 'Pay Dart Charge or Fine',
+            description: 'Pay for Dartford Crossing online or Create an account',
+            url: 'https://www.gov.uk/pay-dartford-crossing-charge',
             type: 'payment'
           }
         ]
@@ -116,7 +104,7 @@ export const categoryData: Record<string, CategoryData> = {
           {
             title: 'Pay Congestion Charge',
             description: 'Pay London Congestion Charge online',
-            url: 'https://tfl.gov.uk/modes/driving/congestion-charge/congestion-charge-zone',
+            url: 'https://tfl.gov.uk/modes/driving/pay-to-drive-in-london',
             type: 'payment'
           },
           {
@@ -138,14 +126,8 @@ export const categoryData: Record<string, CategoryData> = {
         description: 'Clean Air Zones and local authority charges',
         links: [
           {
-            title: 'Birmingham Clean Air Zone',
-            description: 'Pay Birmingham Clean Air Zone charge',
-            url: 'https://www.brumcaz.co.uk/',
-            type: 'payment'
-          },
-          {
-            title: 'Clean Air Zone Checker',
-            description: 'Check if your vehicle needs to pay clean air charges',
+            title: 'Clean Air Zone Checker & Payment',
+            description: 'Check if your vehicle needs to pay clean air charges or pay online',
             url: 'https://www.gov.uk/clean-air-zones',
             type: 'information'
           }
@@ -189,43 +171,19 @@ export const categoryData: Record<string, CategoryData> = {
         ]
       },
       {
-        title: 'Direct Insurance Providers',
-        description: 'Major UK car insurance companies',
-        links: [
-          {
-            title: 'Direct Line',
-            description: 'Get a quote directly from Direct Line',
-            url: 'https://www.directline.com/car-insurance',
-            type: 'information'
-          },
-          {
-            title: 'Admiral',
-            description: 'Admiral car insurance quotes and policies',
-            url: 'https://www.admiral.com/car-insurance',
-            type: 'information'
-          },
-          {
-            title: 'Aviva',
-            description: 'Aviva car insurance products',
-            url: 'https://www.aviva.co.uk/car-insurance/',
-            type: 'information'
-          }
-        ]
-      },
-      {
         title: 'Insurance Information',
         description: 'Useful resources and government information',
         links: [
           {
             title: 'Motor Insurance Database',
             description: 'Check if a vehicle is insured (MID)',
-            url: 'https://ownvehicle.askmid.com/',
-            type: 'government'
+            url: 'https://enquiry.navigate.mib.org.uk/checkyourvehicle',
+            type: 'information'
           },
           {
             title: 'Insurance Claims',
             description: 'How to make a car insurance claim',
-            url: 'https://www.abi.org.uk/products-and-issues/topics-and-issues/motor/making-a-claim/',
+            url: 'https://www.citizensadvice.org.uk/consumer/insurance/insurance-claims/making-a-claim-on-your-insurance-policy/',
             type: 'information'
           }
         ]
@@ -248,16 +206,16 @@ export const categoryData: Record<string, CategoryData> = {
             type: 'government'
           },
           {
-            title: 'Find MOT Test Centre',
-            description: 'Find approved MOT test centres near you',
-            url: 'https://www.gov.uk/find-mot-test-centre',
-            type: 'government'
-          },
-          {
             title: 'MOT Reminder Service',
             description: 'Get email or text reminders for MOT due date',
             url: 'https://www.gov.uk/mot-reminder',
             type: 'government'
+          },
+          {
+            title: 'Find MOT Test Centre',
+            description: 'Find an MOT test centre near you',
+            url: 'https://www.google.com/maps/search/MOT+Test+Centre+Near+Me',
+            type: 'information'
           }
         ]
       },
@@ -280,7 +238,7 @@ export const categoryData: Record<string, CategoryData> = {
           {
             title: 'SORN Declaration',
             description: 'Declare your vehicle off road (SORN)',
-            url: 'https://www.gov.uk/make-sorn',
+            url: 'https://www.gov.uk/make-a-sorn',
             type: 'government'
           }
         ]
