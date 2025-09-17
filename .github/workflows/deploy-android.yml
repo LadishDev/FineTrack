@@ -55,15 +55,17 @@ jobs:
         if: steps.check.outputs.should_deploy == 'true'
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
 
       - run: npm ci
         if: steps.check.outputs.should_deploy == 'true'
 
+
       - name: Build web assets
         if: steps.check.outputs.should_deploy == 'true'
-        run: npm run build
+        run: |
+          npm run cap:build
 
       - name: Decode keystore from secret
         if: steps.check.outputs.should_deploy == 'true'
