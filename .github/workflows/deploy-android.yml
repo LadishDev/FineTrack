@@ -1,5 +1,6 @@
 permissions:
   contents: write
+
 name: Build & Deploy Android Release APK
 
 on:
@@ -56,6 +57,7 @@ jobs:
         with:
           node-version: 18
           cache: npm
+
       - run: npm ci
         if: steps.check.outputs.should_deploy == 'true'
 
@@ -86,6 +88,11 @@ jobs:
           cd android
           ./gradlew assembleRelease
 
+      - name: Rename APK with version
+        if: steps.check.outputs.should_deploy == 'true'
+        run: |
+          mv android/app/build/outputs/apk/release/app-release.apk \
+             android/app/build/outputs/apk/release/FineTrack-v${{ steps.get_version.outputs.version }}.apk
 
       - name: Create and push git tag for version
         if: steps.check.outputs.should_deploy == 'true'
@@ -95,25 +102,12 @@ jobs:
           git tag "v${{ steps.get_version.outputs.version }}"
           git push origin "v${{ steps.get_version.outputs.version }}"
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release and Upload APK
         if: steps.check.outputs.should_deploy == 'true'
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
-          release_name: Release v${{ steps.get_version.outputs.version }}
-          draft: false
-          prerelease: false
-
-      - name: Upload APK to Release
-        if: steps.check.outputs.should_deploy == 'true'
-        uses: actions/upload-release-asset@v1
+          name: Release v${{ steps.get_version.outputs.version }}
+          files: android/app/build/outputs/apk/release/FineTrack-v${{ steps.get_version.outputs.version }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: android/app/build/outputs/apk/release/app-release.apk
-          asset_name: FineTrack-v${{ steps.get_version.outputs.version }}.apk
-          asset_content_type: application/vnd.android.package-archive
