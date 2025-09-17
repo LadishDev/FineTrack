@@ -9,11 +9,6 @@ const config: CapacitorConfig = {
     captureInput: true,
     webContentsDebuggingEnabled: true
   },
-  server: {
-    // Allow cleartext traffic for development
-    cleartext: true,
-    androidScheme: 'http'
-  }
 };
 
 export default config;
