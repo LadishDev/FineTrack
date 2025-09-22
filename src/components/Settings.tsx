@@ -30,7 +30,7 @@ export default function Settings({ onSync, isOnline = false, onReportBug, onSugg
                 <WifiOff className="h-5 w-5 text-red-600 mr-2" />
               )}
               <span className="text-sm font-medium text-gray-700">
-                Connection Status: {isOnline ? 'Online' : 'Offline'}
+                Connection Status: {isOnline ? 'Online' : 'Offline'} - Currently Disabled
               </span>
             </div>
           </div>
