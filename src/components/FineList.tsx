@@ -37,9 +37,12 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
     return 'bg-yellow-100 text-yellow-800';
   };
 
-  // New: inline edit state
+  // Inline edit state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<Partial<Fine>>({});
+
+  // Confirm delete modal state
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const startEdit = (fine: Fine) => {
     setEditingId(fine.id);
@@ -62,14 +65,12 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
   };
 
   const saveEdit = async (id: string) => {
-    // Only send fields that changed
     const updates: Partial<Fine> = { ...editValues };
     try {
       await onUpdateFine(id, updates);
       setEditingId(null);
       setEditValues({});
     } catch (err) {
-      // keep editing so user can retry; storage layer surfaces errors through UI
       console.error('Failed to save fine:', err);
     }
   };
@@ -81,19 +82,19 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">All Fines</h2>
-        <div className="text-sm text-gray-600 mt-1">
-        {fines.length} total fines
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">All Fines</h2>
+          <div className="text-sm text-gray-600 mt-1">
+            {fines.length} total fines
+          </div>
         </div>
-      </div>
-      <button
-        onClick={onAddFine}
-        className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        <Plus className="h-4 w-4" />
-        <span>Add Fine</span>
-      </button>
+        <button
+          onClick={onAddFine}
+          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="h-4 w-4" />
+          <span>Add Fine</span>
+        </button>
       </div>
 
       {fines.length === 0 ? (
@@ -106,22 +107,37 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
           {sortedFines.map((fine) => (
             <div key={fine.id} className="bg-white rounded-lg shadow-md p-6">
               {editingId === fine.id ? (
-                <form className="space-y-6" onSubmit={e => { e.preventDefault(); saveEdit(fine.id); }}>
+                <form
+                  className="space-y-6"
+                  onSubmit={e => { e.preventDefault(); saveEdit(fine.id); }}
+                >
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-gray-900">Edit Fine</h2>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor({ ...fine, status: editValues.status || fine.status })}`}>{editValues.status || fine.status}</span>
-                      <select value={String(editValues.status || fine.status)} onChange={e => handleInput('status', e.target.value as Fine['status'])} className="ml-2 px-2 py-1 rounded border border-gray-300 text-xs">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor({ ...fine, status: editValues.status || fine.status })}`}>
+                        {editValues.status || fine.status}
+                      </span>
+                      <select
+                        value={String(editValues.status || fine.status)}
+                        onChange={e => handleInput('status', e.target.value as Fine['status'])}
+                        className="ml-2 px-2 py-1 rounded border border-gray-300 text-xs"
+                      >
                         <option value="unpaid">Unpaid</option>
                         <option value="paid">Paid</option>
                         <option value="disputed">Disputed</option>
                       </select>
                     </div>
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Fine Type *</label>
-                      <select value={String(editValues.type || fine.type)} onChange={e => handleInput('type', e.target.value as Fine['type'])} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                      <select
+                        value={String(editValues.type || fine.type)}
+                        onChange={e => handleInput('type', e.target.value as Fine['type'])}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      >
                         <option value="parking">Parking Fine</option>
                         <option value="speeding">Speeding Fine</option>
                         <option value="dartford">Dartford Crossing Penalty</option>
@@ -131,44 +147,104 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Amount (£) *</label>
-                      <input type="number" value={String(editValues.amount ?? fine.amount)} onChange={e => handleInput('amount', parseFloat(e.target.value || '0'))} step="0.01" min="0" className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      <input
+                        type="number"
+                        value={String(editValues.amount ?? fine.amount)}
+                        onChange={e => handleInput('amount', parseFloat(e.target.value || '0'))}
+                        step="0.01"
+                        min="0"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
                     </div>
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
-                    <input type="text" value={String(editValues.title || '')} onChange={e => handleInput('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Parking fine - High Street" required />
+                    <input
+                      type="text"
+                      value={String(editValues.title || '')}
+                      onChange={e => handleInput('title', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Parking fine - High Street"
+                      required
+                    />
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <textarea value={String(editValues.description || '')} onChange={e => handleInput('description', e.target.value)} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Additional details about the fine..." />
+                    <textarea
+                      value={String(editValues.description || '')}
+                      onChange={e => handleInput('description', e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Additional details about the fine..."
+                    />
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Due Date *</label>
-                      <input type="date" value={editValues.dueDate ? new Date(editValues.dueDate).toISOString().split('T')[0] : new Date(fine.dueDate).toISOString().split('T')[0]} onChange={e => handleInput('dueDate', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      <input
+                        type="date"
+                        value={editValues.dueDate ? new Date(editValues.dueDate).toISOString().split('T')[0] : new Date(fine.dueDate).toISOString().split('T')[0]}
+                        onChange={e => handleInput('dueDate', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
-                      <input type="text" value={String(editValues.referenceNumber || '')} onChange={e => handleInput('referenceNumber', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="PCN123456789" />
+                      <input
+                        type="text"
+                        value={String(editValues.referenceNumber || '')}
+                        onChange={e => handleInput('referenceNumber', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="PCN123456789"
+                      />
                     </div>
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Registration</label>
-                      <input type="text" value={String(editValues.vehicleReg || '')} onChange={e => handleInput('vehicleReg', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="AB12 CDE" />
+                      <input
+                        type="text"
+                        value={String(editValues.vehicleReg || '')}
+                        onChange={e => handleInput('vehicleReg', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="AB12 CDE"
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                      <input type="text" value={String(editValues.location || '')} onChange={e => handleInput('location', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., High Street Car Park" />
+                      <input
+                        type="text"
+                        value={String(editValues.location || '')}
+                        onChange={e => handleInput('location', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., High Street Car Park"
+                      />
                     </div>
                   </div>
+
                   <div className="flex justify-end space-x-4 pt-6">
-                    <button type="button" onClick={cancelEdit} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
-                    <button type="submit" className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">Save Changes</button>
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      Save Changes
+                    </button>
                   </div>
                 </form>
               ) : (
-                // View mode - two column layout
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
@@ -177,38 +253,19 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
                         {fine.status}
                       </span>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-600">
-                      <div>
-                        <span className="font-medium">Type:</span> {getTypeLabel(fine.type)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Amount:</span> £{fine.amount.toFixed(2)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Due Date:</span> {format(new Date(fine.dueDate), 'MMM dd, yyyy')}
-                      </div>
 
-                      {fine.referenceNumber && (
-                        <div>
-                          <span className="font-medium">Reference:</span> {fine.referenceNumber}
-                        </div>
-                      )}
-                      {fine.vehicleReg && (
-                        <div>
-                          <span className="font-medium">Vehicle:</span> {fine.vehicleReg}
-                        </div>
-                      )}
-                      {fine.location && (
-                        <div>
-                          <span className="font-medium">Location:</span> {fine.location}
-                        </div>
-                      )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-600">
+                      <div><span className="font-medium">Type:</span> {getTypeLabel(fine.type)}</div>
+                      <div><span className="font-medium">Amount:</span> £{fine.amount.toFixed(2)}</div>
+                      <div><span className="font-medium">Due Date:</span> {format(new Date(fine.dueDate), 'MMM dd, yyyy')}</div>
+                      {fine.referenceNumber && <div><span className="font-medium">Reference:</span> {fine.referenceNumber}</div>}
+                      {fine.vehicleReg && <div><span className="font-medium">Vehicle:</span> {fine.vehicleReg}</div>}
+                      {fine.location && <div><span className="font-medium">Location:</span> {fine.location}</div>}
                     </div>
-                    
+
                     {fine.description && (<p className="mt-3 text-gray-600">{fine.description}</p>)}
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 ml-4">
                     {fine.paymentLink && (
                       <a
@@ -221,13 +278,15 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     )}
-
-                    <button onClick={()=>startEdit(fine)} title="Edit fine" className="p-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                    <button
+                      onClick={() => startEdit(fine)}
+                      title="Edit fine"
+                      className="p-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                    >
                       <Edit3 className="h-4 w-4" />
                     </button>
-
                     <button
-                      onClick={() => onDeleteFine(fine.id)}
+                      onClick={() => setConfirmDeleteId(fine.id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete fine"
                     >
@@ -238,6 +297,38 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Global Delete Confirmation Modal */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm border border-gray-200 flex flex-col items-center" role="document">
+            <div className="flex items-center gap-2 mb-2">
+              <Trash2 className="h-5 w-5 text-red-500" />
+              <h3 className="text-lg font-bold text-gray-900">Delete Fine</h3>
+            </div>
+            <div className="mb-4 text-gray-700 text-center text-sm">
+              Are you sure you want to permanently delete this fine?<br />
+              <span className="font-semibold text-gray-900">
+                {fines.find(f => f.id === confirmDeleteId)?.title}
+              </span>
+            </div>
+            <div className="flex w-full justify-center gap-3 mt-2">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="px-4 py-2 rounded-md border border-gray-300 bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 active:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { onDeleteFine(confirmDeleteId); setConfirmDeleteId(null); }}
+                className="px-4 py-2 rounded-md bg-red-600 text-white font-medium hover:bg-red-700 active:bg-red-800 transition shadow"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
