@@ -64,9 +64,6 @@ jobs:
           echo "Building for GitHub Pages"
           DEPLOY_ENV=github npx vite build
 
-      - name: Create 404 fallback for SPA routing
-        if: steps.check.outputs.should_deploy == 'true'
-        run: cp dist/index.html dist/404.html
 
       - name: Save version marker
         if: steps.check.outputs.should_deploy == 'true'

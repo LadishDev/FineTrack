@@ -1,3 +1,4 @@
+import NotFound404 from './components/404';
 import { useState, useEffect, useRef } from 'react';
 import { APP_VERSION } from './version';
 import Footer from './components/Footer';
@@ -200,7 +201,9 @@ const parsePath = (path: string) => {
     'add-suggestion': 'add-suggestion',
   };
 
-  return { view: map[relativePath] || 'dashboard', category: null };
+  return map.hasOwnProperty(relativePath)
+    ? { view: map[relativePath], category: null }
+    : { view: '404', category: null };
 };
 
   const initial = parsePath(window.location.pathname);
@@ -639,14 +642,12 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
                 onCategorySelect={handleCategorySelect}
               />
             )}
-            
             {currentView === 'add' && (
               <AddFine 
                 onAddFine={handleAddFine}
                 goBack={goBack}
               />
             )}
-            
             {currentView === 'list' && (
               <FineList 
                 fines={fines}
@@ -655,7 +656,6 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
                 onDeleteFine={handleDeleteFine}
               />
             )}
-            
             {currentView === 'links' && !currentCategory && (
               <LinksPage 
                 category={undefined}
@@ -665,7 +665,6 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
                 cameFromLinksPage={navigationHistory.length > 1 && navigationHistory[navigationHistory.length - 2]?.view === 'links'}
               />
             )}
-            
             {currentView === 'links' && currentCategory && (
               <CategoryLinksPage 
                 category={currentCategory}
@@ -674,7 +673,6 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
                   : handleBackToDashboard}
               />
             )}
-            
             {currentView === 'settings' && (
               <Settings 
                 onSync={syncData}
@@ -684,7 +682,6 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
                 onDonation={handleDonation}
               />
             )}
-            
             {currentView === 'report-bug' && (
               <ReportBug 
                 onCancel={() => navigateTo('settings')}
@@ -694,6 +691,9 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
               <SuggestFeature
                 onCancel={() => navigateTo('settings')}
               />
+            )}
+            {currentView === '404' && (
+              <NotFound404 goBack={() => window.history.length > 1 ? window.history.back() : navigateTo('dashboard', true)} goHome={() => navigateTo('dashboard', true)} />
             )}
           </>
         )}
