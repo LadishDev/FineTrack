@@ -1,6 +1,8 @@
 import NotFound404 from './components/404';
 import { useState, useEffect, useRef } from 'react';
 import { APP_VERSION } from './version';
+import { fetchLatestGitHubVersion } from './services/updateCheck';
+import UpdateBanner from './components/UpdateBanner';
 import Footer from './components/Footer';
 import PrivacyNotice from './components/PrivacyNotice';
 import Header from './components/Header';
@@ -24,6 +26,46 @@ export const BASE_PATH = repoName ? `/${repoName}/` : '/';
 const PRIVACY_ACCEPTED_VERSION_KEY = 'privacyAcceptedVersion';
 
 function App() {
+  // Update check state
+  const [updateInfo, setUpdateInfo] = useState<{version: string, url: string} | null>(null);
+  const [updatePromptCount, setUpdatePromptCount] = useState<number>(0);
+
+  // Helper: get/set next update prompt time from localStorage
+  const getNextUpdatePrompt = (version: string) => {
+    const key = `nextUpdatePrompt_${version}`;
+    const val = localStorage.getItem(key);
+    return val ? parseInt(val) : 0;
+  };
+  const setNextUpdatePrompt = (version: string, when: number) => {
+    const key = `nextUpdatePrompt_${version}`;
+    localStorage.setItem(key, String(when));
+  };
+  const getUpdatePromptCount = (version: string) => {
+    const key = `updatePromptCount_${version}`;
+    const val = localStorage.getItem(key);
+    return val ? parseInt(val) : 0;
+  };
+  const setUpdatePromptCountLS = (version: string, count: number) => {
+    const key = `updatePromptCount_${version}`;
+    localStorage.setItem(key, String(count));
+  };
+
+  // Check for updates on mount and every reload
+  useEffect(() => {
+    let ignore = false;
+    fetchLatestGitHubVersion().then(info => {
+      if (!ignore && info && info.version && info.version !== APP_VERSION) {
+        // Check if we should show the update modal now
+        const now = Date.now();
+        const nextPrompt = getNextUpdatePrompt(info.version);
+        if (!nextPrompt || now >= nextPrompt) {
+          setUpdateInfo(info);
+          setUpdatePromptCount(getUpdatePromptCount(info.version));
+        }
+      }
+    });
+    return () => { ignore = true; };
+  }, []);
   // Notification setup
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
@@ -566,10 +608,35 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
     }
   }, []);
 
+
+  // Show update modal before anything else if update is available
+  if (updateInfo) {
+    const handleUpdateDismiss = () => {
+      // Schedule next prompt: 2 days, 2 days, then every week
+      const now = Date.now();
+      let nextDelay = 0;
+      let count = updatePromptCount + 1;
+      if (count === 1) nextDelay = 2 * 24 * 60 * 60 * 1000; // 2 days
+      else if (count === 2) nextDelay = 2 * 24 * 60 * 60 * 1000; // 2 days
+      else nextDelay = 7 * 24 * 60 * 60 * 1000; // 1 week
+      setNextUpdatePrompt(updateInfo.version, now + nextDelay);
+      setUpdatePromptCountLS(updateInfo.version, count);
+      setUpdateInfo(null);
+      setUpdatePromptCount(count);
+    };
+    return (
+      <UpdateBanner
+        latestVersion={updateInfo.version}
+        downloadUrl={updateInfo.url}
+        onClose={handleUpdateDismiss}
+      />
+    );
+  }
+
   if (!privacyAccepted) {
     return (
-      <PrivacyNotice 
-        onAccept={handleAcceptPrivacy} 
+      <PrivacyNotice
+        onAccept={handleAcceptPrivacy}
         onDeny={handleDenyPrivacy}
         isUpdate={!!previousAcceptedVersion}
         previousVersion={previousAcceptedVersion}
