@@ -13,12 +13,50 @@ import ReportBug from './components/ReportBug';
 import SuggestFeature from './components/SuggestFeature';
 import { Fine } from './types';
 import { useStorage } from './hooks/useStorage';
+// Capacitor Local Notifications
+import { LocalNotifications } from '@capacitor/local-notifications';
 
-const repoName = import.meta.env.VITE_REPO_NAME || window.location.pathname.split('/')[1];
+// Use VITE_REPO_NAME for GitHub Pages, otherwise default to '/'
+const repoName = import.meta.env.VITE_REPO_NAME;
 export const BASE_PATH = repoName ? `/${repoName}/` : '/';
 
 const PRIVACY_ACCEPTED_VERSION_KEY = 'privacyAcceptedVersion';
+
 function App() {
+  // Notification setup
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Helper to show notification (browser or native)
+  const showNotification = async (title: string, options?: NotificationOptions) => {
+    // Try native first
+    if ((window as any).Capacitor && LocalNotifications) {
+      try {
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              title,
+              body: options?.body || '',
+              id: Math.floor(Math.random() * 1000000),
+              schedule: { at: new Date() },
+              sound: undefined,
+              attachments: options?.icon ? [{ id: 'icon', url: options.icon }] : undefined,
+            },
+          ],
+        });
+        return;
+      } catch (e) {
+        // fallback to browser
+      }
+    }
+    // Browser fallback
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, options);
+    }
+  };
   const { 
     fines, 
     loading, 
@@ -30,6 +68,79 @@ function App() {
     isOnline,
     clearError 
   } = useStorage();
+
+  // --- Notification scheduling logic ---
+  // Read notification settings from localStorage (fallbacks)
+  const [pushEnabled, setPushEnabled] = useState(() => {
+    const v = localStorage.getItem('pushNotificationsEnabled');
+    return v === null ? true : v === 'true';
+  });
+  const [reminderDays, setReminderDays] = useState(() => {
+    const v = localStorage.getItem('reminderDaysBeforeDue');
+    return v ? parseInt(v) : 7;
+  });
+
+  // Listen for settings changes (Settings.tsx uses defaultChecked/defaultValue, so we need to sync manually)
+  useEffect(() => {
+    const handler = () => {
+      const v = localStorage.getItem('pushNotificationsEnabled');
+      setPushEnabled(v === null ? true : v === 'true');
+      const d = localStorage.getItem('reminderDaysBeforeDue');
+      setReminderDays(d ? parseInt(d) : 7);
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
+
+  // Helper: get fines due within reminder window
+  function getFinesDueSoon() {
+    const now = new Date();
+    const soon = new Date(now);
+    soon.setDate(now.getDate() + reminderDays);
+    return fines.filter(fine => {
+      if (!fine.dueDate) return false;
+      const due = new Date(fine.dueDate);
+      return due > now && due <= soon;
+    });
+  }
+
+  // Schedule notifications: on load and every morning + 6pm
+  useEffect(() => {
+    if (!pushEnabled) return;
+    // Helper to check and notify
+    const notifyDueFines = async () => {
+      const dueFines = getFinesDueSoon();
+      if (dueFines.length === 0) return;
+      for (const fine of dueFines) {
+        await showNotification('Fine Due Soon', {
+          body: `"${fine.title || 'A fine'}" is due on ${fine.dueDate}`,
+          icon: '/logo_image.png',
+        });
+      }
+    };
+    // On load
+    notifyDueFines();
+    // Schedule for 8am and 6pm
+    function scheduleNext(hour: number) {
+      const now = new Date();
+      const next = new Date(now);
+      next.setHours(hour, 0, 0, 0);
+      if (next <= now) next.setDate(next.getDate() + 1);
+      return next.getTime() - now.getTime();
+    }
+    const morningTimeout = setTimeout(() => {
+      notifyDueFines();
+      setInterval(notifyDueFines, 24 * 60 * 60 * 1000); // every morning
+    }, scheduleNext(8));
+    const eveningTimeout = setTimeout(() => {
+      notifyDueFines();
+      setInterval(notifyDueFines, 24 * 60 * 60 * 1000); // every evening
+    }, scheduleNext(18));
+    return () => {
+      clearTimeout(morningTimeout);
+      clearTimeout(eveningTimeout);
+    };
+  }, [fines, pushEnabled, reminderDays]);
 
   // Privacy/terms gating logic (version-aware)
   const [privacyAccepted, setPrivacyAccepted] = useState<boolean>(() => {

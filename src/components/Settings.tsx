@@ -10,6 +10,16 @@ interface SettingsProps {
 }
 
 export default function Settings({ onSync, isOnline = false, onReportBug, onSuggestion, onDonation }: SettingsProps) {
+  // --- Notification settings handlers ---
+  const handlePushChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    localStorage.setItem('pushNotificationsEnabled', e.target.checked ? 'true' : 'false');
+    window.dispatchEvent(new Event('storage'));
+  };
+  const handleReminderDaysChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    localStorage.setItem('reminderDaysBeforeDue', e.target.value);
+    window.dispatchEvent(new Event('storage'));
+  };
+  // Email notifications not implemented, so just UI
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
@@ -59,21 +69,20 @@ export default function Settings({ onSync, isOnline = false, onReportBug, onSugg
             <Bell className="h-5 w-5 text-blue-600 mr-2" />
             <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
           </div>
-          
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">Email notifications</span>
-              <input type="checkbox" className="rounded" defaultChecked />
+              <input type="checkbox" className="rounded" defaultChecked disabled />
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">Push notifications</span>
-              <input type="checkbox" className="rounded" defaultChecked />
+              <input type="checkbox" className="rounded" defaultChecked={localStorage.getItem('pushNotificationsEnabled') !== 'false'} onChange={handlePushChange} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-2">
                 Reminder days before due date
               </label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md" defaultValue="7">
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md" defaultValue={localStorage.getItem('reminderDaysBeforeDue') || '7'} onChange={handleReminderDaysChange}>
                 <option value="1">1 day</option>
                 <option value="3">3 days</option>
                 <option value="7">7 days</option>

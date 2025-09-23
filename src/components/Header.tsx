@@ -122,7 +122,7 @@ export default function Header({ currentView, setCurrentView, onBackToDashboard,
               className="flex items-center text-gray-900 focus:outline-none rounded-md hover:bg-gray-50 px-2 py-1"
             >
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mr-3">
-                <img src="logo_image.png" alt="FineTrack logo" />
+                <img src="/logo_image.png" alt="FineTrack logo" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 FineTrack
