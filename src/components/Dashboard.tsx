@@ -9,6 +9,12 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ fines, onAddFine, onCategorySelect }: DashboardProps) {
+  // Format currency in shorthand (e.g., 1.2k, 2.3M)
+  const formatCurrency = (amount: number) => {
+    if (amount >= 1000000) return (amount / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (amount >= 100000) return (amount / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return amount.toFixed(2);
+  };
   const unpaidFines = fines.filter(fine => fine.status === 'unpaid');
   // Treat a fine as overdue if it's explicitly marked 'overdue',
   // or if it's still 'unpaid' and the dueDate is in the past.
@@ -121,7 +127,7 @@ const stats = [
                       <p className="text-sm text-gray-600">{getTypeLabel(fine.type)}</p>
                       <p className="text-sm text-red-600">Due: {format(new Date(fine.dueDate), 'MMM dd, yyyy')}</p>
                     </div>
-                    <p className="font-bold text-red-600">£{fine.amount.toFixed(2)}</p>
+                    <p className="font-bold text-red-600">£{formatCurrency(fine.amount)}</p>
                   </div>
                 </div>
               ))}
@@ -147,7 +153,7 @@ const stats = [
                       <p className="text-sm text-gray-600">{getTypeLabel(fine.type)}</p>
                       <p className="text-sm text-yellow-600">Due: {format(new Date(fine.dueDate), 'MMM dd, yyyy')}</p>
                     </div>
-                    <p className="font-bold text-yellow-600">£{fine.amount.toFixed(2)}</p>
+                    <p className="font-bold text-yellow-600">£{formatCurrency(fine.amount)}</p>
                   </div>
                 </div>
               ))}
