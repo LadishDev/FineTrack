@@ -105,7 +105,7 @@ When you visit the app in a modern browser, you'll see an install prompt. Click 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## Roadmap
 
