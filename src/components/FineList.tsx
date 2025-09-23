@@ -106,85 +106,67 @@ export default function FineList({ fines, onAddFine, onUpdateFine, onDeleteFine 
           {sortedFines.map((fine) => (
             <div key={fine.id} className="bg-white rounded-lg shadow-md p-6">
               {editingId === fine.id ? (
-                // Edit mode - full width layout
-                <div>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <input 
-                      value={String(editValues.title || '')} 
-                      onChange={(e)=>handleInput('title', e.target.value)} 
-                      className="flex-1 text-lg font-semibold border border-gray-200 rounded px-3 py-2" 
-                      placeholder="Fine title"
-                    />
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(fine)}`}>
-                      {fine.status}
-                    </span>
+                <form className="space-y-6" onSubmit={e => { e.preventDefault(); saveEdit(fine.id); }}>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Edit Fine</h2>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor({ ...fine, status: editValues.status || fine.status })}`}>{editValues.status || fine.status}</span>
+                      <select value={String(editValues.status || fine.status)} onChange={e => handleInput('status', e.target.value as Fine['status'])} className="ml-2 px-2 py-1 rounded border border-gray-300 text-xs">
+                        <option value="unpaid">Unpaid</option>
+                        <option value="paid">Paid</option>
+                        <option value="disputed">Disputed</option>
+                      </select>
+                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <span className="font-medium">Type:</span>
-                      <select value={String(editValues.type || fine.type)} onChange={(e)=>handleInput('type', e.target.value as Fine['type'])} className="ml-2 px-2 py-1 rounded border border-gray-200">
-                        <option value="speeding">Speeding</option>
-                        <option value="parking">Parking</option>
-                        <option value="dartford">Dartford Crossing</option>
-                        <option value="mot">MOT</option>
-                        <option value="insurance">Insurance</option>
-                        <option value="congestion">Congestion Charge</option>
-                        <option value="other">Other</option>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Fine Type *</label>
+                      <select value={String(editValues.type || fine.type)} onChange={e => handleInput('type', e.target.value as Fine['type'])} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="parking">Parking Fine</option>
+                        <option value="speeding">Speeding Fine</option>
+                        <option value="dartford">Dartford Crossing Penalty</option>
+                        <option value="congestion">Congestion Charge Penalty</option>
+                        <option value="other">Other Fine/Penalty</option>
                       </select>
                     </div>
                     <div>
-                      <span className="font-medium">Amount:</span>
-                      <input type="number" step="0.01" value={String(editValues.amount ?? fine.amount)} onChange={(e)=>handleInput('amount', parseFloat(e.target.value || '0'))} className="ml-2 border border-gray-200 rounded px-2 py-1" />
-                    </div>
-                    <div>
-                      <span className="font-medium">Due Date:</span>
-                      <input type="date" value={editValues.dueDate ? new Date(editValues.dueDate).toISOString().split('T')[0] : new Date(fine.dueDate).toISOString().split('T')[0]} onChange={(e)=>handleInput('dueDate', e.target.value)} className="ml-2 border border-gray-200 rounded px-2 py-1" />
-                    </div>
-
-                    <div>
-                      <span className="font-medium">Reference:</span>
-                      <input value={String(editValues.referenceNumber || '')} onChange={(e)=>handleInput('referenceNumber', e.target.value)} className="ml-2 border border-gray-200 rounded px-2 py-1 w-full" />
-                    </div>
-
-                    <div>
-                      <span className="font-medium">Vehicle:</span>
-                      <input value={String(editValues.vehicleReg || '')} onChange={(e)=>handleInput('vehicleReg', e.target.value)} className="ml-2 border border-gray-200 rounded px-2 py-1 w-full" />
-                    </div>
-
-                    <div>
-                      <span className="font-medium">Location:</span>
-                      <input value={String(editValues.location || '')} onChange={(e)=>handleInput('location', e.target.value)} className="ml-2 border border-gray-200 rounded px-2 py-1 w-full" />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Amount (£) *</label>
+                      <input type="number" value={String(editValues.amount ?? fine.amount)} onChange={e => handleInput('amount', parseFloat(e.target.value || '0'))} step="0.01" min="0" className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                     </div>
                   </div>
-                  
-                  <div className="mt-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Notes:</label>
-                    <textarea 
-                      value={String(editValues.description || '')} 
-                      onChange={(e)=>handleInput('description', e.target.value)} 
-                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
-                      rows={3}
-                      placeholder="Add any additional notes about this fine..."
-                    />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                    <input type="text" value={String(editValues.title || '')} onChange={e => handleInput('title', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Parking fine - High Street" required />
                   </div>
-
-                  {/* Edit buttons at bottom */}
-                  <div className="mt-6 flex flex-col gap-3 border-t pt-4">
-                    <button 
-                      onClick={()=>saveEdit(fine.id)} 
-                      className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      Save Changes
-                    </button>
-                    <button 
-                      onClick={cancelEdit} 
-                      className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-                    >
-                      Cancel
-                    </button>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea value={String(editValues.description || '')} onChange={e => handleInput('description', e.target.value)} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Additional details about the fine..." />
                   </div>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Due Date *</label>
+                      <input type="date" value={editValues.dueDate ? new Date(editValues.dueDate).toISOString().split('T')[0] : new Date(fine.dueDate).toISOString().split('T')[0]} onChange={e => handleInput('dueDate', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
+                      <input type="text" value={String(editValues.referenceNumber || '')} onChange={e => handleInput('referenceNumber', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="PCN123456789" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Registration</label>
+                      <input type="text" value={String(editValues.vehicleReg || '')} onChange={e => handleInput('vehicleReg', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="AB12 CDE" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                      <input type="text" value={String(editValues.location || '')} onChange={e => handleInput('location', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., High Street Car Park" />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-4 pt-6">
+                    <button type="button" onClick={cancelEdit} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+                    <button type="submit" className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">Save Changes</button>
+                  </div>
+                </form>
               ) : (
                 // View mode - two column layout
                 <div className="flex items-start justify-between">
