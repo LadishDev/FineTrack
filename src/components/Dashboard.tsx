@@ -25,7 +25,13 @@ export default function Dashboard({ fines, onAddFine, onCategorySelect }: Dashbo
 const stats = [
     {
         title: 'Total Unpaid',
-        value: `£${totalUnpaidAmount.toFixed(2)}`,
+        value: `£${
+          totalUnpaidAmount >= 100000
+            ? totalUnpaidAmount >= 1000000
+              ? (totalUnpaidAmount / 1000000).toFixed(1).replace(/\.0$/, '') + 'M'
+              : (totalUnpaidAmount / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+            : totalUnpaidAmount.toFixed(2)
+        }`,
         icon: PoundSterling,
         color: 'text-red-600',
         bgColor: 'bg-red-50'

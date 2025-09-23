@@ -1,7 +1,7 @@
 {
   "name": "finetrack",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Track vehicle fines, charges, MOT, insurance and more in one place",
   "scripts": {
