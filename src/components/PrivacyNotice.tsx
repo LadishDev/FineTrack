@@ -25,10 +25,43 @@ function compareVersions(a?: string | null, b?: string | null): number {
   return 0;
 }
 
+
+import React from 'react';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsAndConditions from './TermsAndConditions';
+
 const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdate, previousVersion, currentVersion }) => {
   const versionChange = compareVersions(currentVersion, previousVersion);
   const isUpgrade = isUpdate && versionChange > 0;
   const isDowngrade = isUpdate && versionChange < 0;
+  const [modal, setModal] = React.useState<'notice' | 'privacy' | 'terms'>('notice');
+
+  // Short summaries for modal
+  const privacySummary = "We collect only necessary data to provide and improve FineTrack. Your data is never sold. See the full policy for details.";
+  const termsSummary = "Use FineTrack lawfully and at your own risk. See the full terms for your rights and obligations.";
+
+  // Modal overlay for full policy/terms
+  if (modal === 'privacy' || modal === 'terms') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+        <div className="bg-white text-gray-900 rounded-2xl shadow-2xl max-w-lg w-full flex flex-col items-center p-0">
+          <div className="w-full p-8 flex-1 flex flex-col">
+            <div className="overflow-y-auto max-h-[60vh] pr-2">
+              {modal === 'privacy' ? <PrivacyPolicy /> : <TermsAndConditions />}
+            </div>
+            <button
+              className="w-full mt-8 bg-gray-300 text-gray-800 rounded-lg py-2 font-semibold hover:bg-gray-400 transition"
+              onClick={() => setModal('notice')}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main notice modal
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4">
       <div className="bg-white text-gray-900 rounded-2xl shadow-2xl max-w-lg w-full p-8">
@@ -60,33 +93,43 @@ const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdat
             </ul>
           </div>
         )}
-      <h2 className="text-xl font-semibold mt-6 mb-2">Privacy Policy</h2>
-      <div className="mb-4 text-xs max-h-32 overflow-y-auto border p-2 rounded bg-gray-50">
-        {/* Insert your privacy policy text here */}
-        <p>Your privacy policy goes here. Explain what data you collect, how it is used, and user rights.</p>
-      </div>
-      <h2 className="text-xl font-semibold mt-6 mb-2">Terms & Conditions</h2>
-      <div className="mb-6 text-xs max-h-32 overflow-y-auto border p-2 rounded bg-gray-50">
-        {/* Insert your terms and conditions text here */}
-        <p>Your terms and conditions go here. Explain the rules for using the app and any disclaimers.</p>
-      </div>
-      <div className="flex gap-4">
+        <h2 className="text-xl font-semibold mt-6 mb-2">Privacy Policy</h2>
+        <div className="mb-4 text-xs max-h-32 overflow-y-auto border p-2 rounded bg-gray-50">
+          <p>{privacySummary}</p>
+        </div>
         <button
-          className="flex-1 bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
-          onClick={onAccept}
+          className="w-full mb-4 bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
+          onClick={() => setModal('privacy')}
         >
-          Accept & Access
+          View Full Privacy Policy
         </button>
+        <h2 className="text-xl font-semibold mt-6 mb-2">Terms & Conditions</h2>
+        <div className="mb-4 text-xs max-h-32 overflow-y-auto border p-2 rounded bg-gray-50">
+          <p>{termsSummary}</p>
+        </div>
         <button
-          className="flex-1 bg-gray-300 text-gray-800 rounded-lg py-2 font-semibold hover:bg-gray-400 transition"
-          onClick={onDeny}
+          className="w-full mb-6 bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
+          onClick={() => setModal('terms')}
         >
-          Deny
+          View Full Terms & Conditions
         </button>
+        <div className="flex gap-4">
+          <button
+            className="flex-1 bg-blue-600 text-white rounded-lg py-2 font-semibold hover:bg-blue-700 transition"
+            onClick={onAccept}
+          >
+            Accept & Access
+          </button>
+          <button
+            className="flex-1 bg-gray-300 text-gray-800 rounded-lg py-2 font-semibold hover:bg-gray-400 transition"
+            onClick={onDeny}
+          >
+            Deny
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-    );
-  };
+  );
+};
 
 export default PrivacyNotice;

@@ -14,6 +14,8 @@ import LinksPage from './components/LinksPage';
 import CategoryLinksPage from './components/CategoryLinksPage';
 import ReportBug from './components/ReportBug';
 import SuggestFeature from './components/SuggestFeature';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsAndConditions from './components/TermsAndConditions';
 import { Fine } from './types';
 import { useStorage } from './hooks/useStorage';
 // Capacitor Local Notifications
@@ -239,6 +241,8 @@ const parsePath = (path: string) => {
     'add': 'add',
     'list': 'list',
     'settings': 'settings',
+    'privacy-policy': 'privacy-policy',
+    'terms-and-conditions': 'terms-and-conditions',
     'report-bug': 'report-bug',
     'add-suggestion': 'add-suggestion',
   };
@@ -321,6 +325,8 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
     add: '/addfine',
     list: '/list',
     settings: '/settings',
+    'privacy-policy': '/privacy-policy',
+    'terms-and-conditions': '/terms-and-conditions',
     links: category ? `/links/${encodeURIComponent(category)}` : '/links',
     'report-bug': '/report-bug',
     'add-suggestion': '/add-suggestion',
@@ -402,6 +408,8 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
           'list': '/list',
           'settings': '/settings',
           'links': previousState.category ? `/links/${encodeURIComponent(previousState.category)}` : '/links',
+          'privacy-policy': '/privacy-policy',
+          'terms-and-conditions': '/terms-and-conditions',
           'report-bug': '/report-bug'
         };
         const to = pathMap[previousState.view] ?? (previousState.view === 'dashboard' ? '/' : '/' + previousState.view);
@@ -759,8 +767,19 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
                 onCancel={() => navigateTo('settings')}
               />
             )}
+            {currentView === 'privacy-policy' && (
+              <PrivacyPolicy 
+              />
+            )}
+            {currentView === 'terms-and-conditions' && (
+              <TermsAndConditions 
+              />
+            )}
             {currentView === '404' && (
-              <NotFound404 goBack={() => window.history.length > 1 ? window.history.back() : navigateTo('dashboard', true)} goHome={() => navigateTo('dashboard', true)} />
+              <NotFound404 
+                goBack={() => window.history.length > 1 ? window.history.back() : navigateTo('dashboard', true)} 
+                goHome={() => navigateTo('dashboard', true)} 
+              />
             )}
           </>
         )}
