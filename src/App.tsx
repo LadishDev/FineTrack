@@ -27,6 +27,19 @@ export const BASE_PATH = repoName ? `/${repoName}/` : '/';
 
 const PRIVACY_ACCEPTED_VERSION_KEY = 'privacyAcceptedVersion';
 
+// --- Version comparison utility ---
+function compareVersions(a: string, b: string): number {
+  const pa = a.split('.').map(Number);
+  const pb = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return 1;
+    if (na < nb) return -1;
+  }
+  return 0;
+}
+
 function App() {
   // Update check state
   const [updateInfo, setUpdateInfo] = useState<{version: string, url: string} | null>(null);
@@ -56,8 +69,8 @@ function App() {
   useEffect(() => {
     let ignore = false;
     fetchLatestGitHubVersion().then(info => {
-      if (!ignore && info && info.version && info.version !== APP_VERSION) {
-        // Check if we should show the update modal now
+      if (!ignore && info && info.version && compareVersions(APP_VERSION, info.version) < 0) {
+        // Only show update if installed version is less than latest
         const now = Date.now();
         const nextPrompt = getNextUpdatePrompt(info.version);
         if (!nextPrompt || now >= nextPrompt) {
