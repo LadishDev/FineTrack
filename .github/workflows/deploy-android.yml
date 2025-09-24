@@ -104,12 +104,23 @@ jobs:
           git tag "v${{ steps.get_version.outputs.version }}"
           git push origin "v${{ steps.get_version.outputs.version }}"
 
+
+      - name: Get release notes from updateLog
+        if: steps.check.outputs.should_deploy == 'true'
+        id: relnotes
+        run: |
+          node scripts/print-latest-updateLog.cjs > release_body.txt
+          echo "release_body<<EOF" >> $GITHUB_OUTPUT
+          cat release_body.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release and Upload APK
         if: steps.check.outputs.should_deploy == 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: Release v${{ steps.get_version.outputs.version }}
+          body: ${{ steps.relnotes.outputs.release_body }}
           files: android/app/build/outputs/apk/release/FineTrack-v${{ steps.get_version.outputs.version }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
