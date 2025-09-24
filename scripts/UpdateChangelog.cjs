@@ -1,4 +1,4 @@
-// Usage: node scripts/update-updateLog.cjs <new-version>
+// Usage: node scripts/UpdateChangelog.cjs
 // This script parses CHANGELOG.md and updates src/updateLog.json with the latest version and summary.
 
 const fs = require('fs');
@@ -6,12 +6,15 @@ const path = require('path');
 
 const changelogPath = path.join(__dirname, '..', 'CHANGELOG.md');
 const updateLogPath = path.join(__dirname, '..', 'src', 'updateLog.json');
+const versionFile = path.join(__dirname, '..', 'src', 'version.ts');
 
-const newVersion = process.argv[2];
-if (!newVersion) {
-  console.error('Usage: node scripts/update-updateLog.cjs <new-version>');
+// Read version from src/version.ts
+const versionMatch = fs.readFileSync(versionFile, 'utf8').match(/VERSION\s*=\s*"([0-9.]+)"/);
+if (!versionMatch) {
+  console.error('Could not find version in src/version.ts');
   process.exit(1);
 }
+const newVersion = versionMatch[1];
 
 const changelog = fs.readFileSync(changelogPath, 'utf8');
 

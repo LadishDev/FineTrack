@@ -14,7 +14,7 @@
     "cap:android": "npx cap open android",
     "cap:run:android": "npx cap run android",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-    "UpdateChangelog": "node scripts/UpdateChangelog.cjs $npm_package_version"
+    "UpdateChangelog": "node scripts/UpdateChangelog.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
