@@ -1,4 +1,3 @@
-import NotFound404 from './components/404';
 import { useState, useEffect, useRef } from 'react';
 import { APP_VERSION } from './version';
 import { fetchLatestGitHubVersion } from './services/updateCheck';
