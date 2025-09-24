@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="3; url=/FineTrack/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Page Not Found | FineTrack</title>
     <style>
@@ -19,10 +18,18 @@
       .btn-secondary:hover { background: #e0e7ef; }
     </style>
     <script>
-      // Optional: after 3s, redirect to dashboard
-      setTimeout(function() {
-        window.location.replace('/FineTrack/');
-      }, 3000);
+      // GitHub Pages SPA redirect: preserve path for client-side routing
+      (function() {
+        var l = window.location;
+        var repo = '/FineTrack'; // Change if your repo name changes
+        if (l.pathname.startsWith(repo)) {
+          var redirect = repo + '/index.html?redirect=' + encodeURIComponent(l.pathname + l.search + l.hash);
+          window.location.replace(redirect);
+        } else {
+          // fallback: just go to root
+          window.location.replace(repo + '/index.html');
+        }
+      })();
     </script>
   </head>
   <body>

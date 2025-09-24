@@ -263,7 +263,37 @@ const parsePath = (path: string) => {
   return { view: map[relativePath] || 'dashboard', category: null };
 };
 
-  const initial = parsePath(window.location.pathname);
+
+  // --- Last visited view logic ---
+  const LAST_VIEW_KEY = 'lastVisitedView';
+  const LAST_CATEGORY_KEY = 'lastVisitedCategory';
+  let initial = parsePath(window.location.pathname);
+  // If path is exactly BASE_PATH (dashboard), check for last visited view
+  if (
+    (window.location.pathname === BASE_PATH || window.location.pathname === BASE_PATH.replace(/\/$/, '')) &&
+    typeof window !== 'undefined'
+  ) {
+    const lastView = localStorage.getItem(LAST_VIEW_KEY);
+    const lastCategory = localStorage.getItem(LAST_CATEGORY_KEY);
+    if (lastView && lastView !== 'dashboard') {
+      initial = { view: lastView, category: lastCategory };
+      // Update URL to match last view
+      const pathMap: Record<string, string> = {
+        dashboard: '/',
+        add: '/addfine',
+        list: '/list',
+        settings: '/settings',
+        'privacy-policy': '/privacy-policy',
+        'terms-and-conditions': '/terms-and-conditions',
+        links: lastCategory ? `/links/${encodeURIComponent(lastCategory)}` : '/links',
+        'report-bug': '/report-bug',
+        'add-suggestion': '/add-suggestion',
+      };
+      const to = pathMap[lastView] ?? '/';
+      const finalPath = `${BASE_PATH.replace(/\/$/, '')}${to}`;
+      window.history.replaceState(null, '', finalPath);
+    }
+  }
   const [currentView, setCurrentView] = useState<string>(initial.view);
   const [currentCategory, setCurrentCategory] = useState<string | null>(initial.category);
   
@@ -326,6 +356,13 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
   // Update category for links
   if (view === 'links') setCurrentCategory(category || null);
   else setCurrentCategory(null);
+
+  // Save last visited view/category
+  try {
+    localStorage.setItem(LAST_VIEW_KEY, view);
+    if (category) localStorage.setItem(LAST_CATEGORY_KEY, category);
+    else localStorage.removeItem(LAST_CATEGORY_KEY);
+  } catch {}
 
   // Update current view
   setCurrentView(view);
@@ -792,7 +829,7 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
         )}
         
         {/* Footer */}
-        <Footer />
+  <Footer navigateTo={navigateTo} />
         </main>
       </div>
     </div>

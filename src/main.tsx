@@ -35,6 +35,16 @@ const setupStatusBar = async () => {
 // Setup status bar when app loads
 setupStatusBar()
 
+
+// --- GitHub Pages SPA redirect handler ---
+// If ?redirect= is present, replace history and reload to the correct path
+const params = new URLSearchParams(window.location.search);
+const redirect = params.get('redirect');
+if (redirect) {
+  // Remove ?redirect= from the URL and push the intended path
+  window.history.replaceState(null, '', redirect);
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
