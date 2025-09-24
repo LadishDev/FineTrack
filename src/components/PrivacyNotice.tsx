@@ -7,10 +7,13 @@ interface PrivacyNoticeProps {
   currentVersion?: string;
 }
 
-const updateLog: Record<string, string> = {
-  '1.0.0': 'Initial public release with privacy/terms gating and versioned update notices.'
-  // Add future version logs here
-};
+
+import updateLogJson from '../updateLog.json';
+
+// Add index signature for TypeScript
+const updateLog: { [key: string]: string } = updateLogJson;
+import pkg from '../../package.json';
+const currentAppVersion = pkg.version;
 
 function compareVersions(a?: string | null, b?: string | null): number {
   if (!a || !b) return 0;
@@ -31,7 +34,8 @@ import PrivacyPolicy from './PrivacyPolicy';
 import TermsAndConditions from './TermsAndConditions';
 
 const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdate, previousVersion, currentVersion }) => {
-  const versionChange = compareVersions(currentVersion, previousVersion);
+  const effectiveVersion = currentVersion || currentAppVersion;
+  const versionChange = compareVersions(effectiveVersion, previousVersion);
   const isUpgrade = isUpdate && versionChange > 0;
   const isDowngrade = isUpdate && versionChange < 0;
   const [modal, setModal] = React.useState<'notice' | 'privacy' | 'terms'>('notice');
@@ -63,7 +67,7 @@ const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdat
 
   // Main notice modal
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4">
+  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-white p-4">
       <div className="bg-white text-gray-900 rounded-2xl shadow-2xl max-w-lg w-full p-8">
         <h1 className="text-3xl font-bold mb-4">
           {isUpgrade ? 'FineTrack has been updated!' : isDowngrade ? 'FineTrack version has been downgraded!' : 'Welcome To FineTrack!'}
@@ -83,14 +87,31 @@ const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onAccept, onDeny, isUpdat
         </p>
         {isUpgrade && (
           <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h2 className="text-lg font-semibold mb-2 text-blue-800">What’s New in {currentVersion}</h2>
-            <ul className="text-xs text-blue-900 list-disc pl-5">
-              {Object.entries(updateLog)
-                .filter(([ver]) => !previousVersion || compareVersions(ver, previousVersion) > 0)
-                .map(([ver, log]) => (
-                  <li key={ver}><span className="font-bold">v{ver}:</span> {log}</li>
-                ))}
-            </ul>
+            <h2 className="text-lg font-semibold mb-2 text-blue-800">What’s New in v{effectiveVersion}</h2>
+            {(() => {
+              // Only show logs for versions between previousVersion (exclusive) and effectiveVersion (inclusive)
+              const versions = Object.keys(updateLog).sort(compareVersions);
+              const filtered = versions.filter(ver =>
+                (!previousVersion || (compareVersions(ver, previousVersion) > 0)) &&
+                compareVersions(ver, effectiveVersion) <= 0
+              );
+              // If no logs match (e.g. user is on a version newer than any in updateLog), show a message
+              if (filtered.length === 0) {
+                return <div className="text-xs text-blue-900">No update notes available for this version.</div>;
+              }
+              return filtered.reverse().map(ver => (
+                <div key={ver} className="mb-2">
+                  <div className="font-bold text-blue-800 mb-1">v{ver}:</div>
+                  <ul className="text-xs text-blue-900 list-disc pl-5">
+                    {updateLog[ver].split('\n').map((line: string, i: number) =>
+                      line.trim() ? (
+                        <li key={i}>{line.replace(/^[-*]\s*/, '')}</li>
+                      ) : null
+                    )}
+                  </ul>
+                </div>
+              ));
+            })()}
           </div>
         )}
         <h2 className="text-xl font-semibold mt-6 mb-2">Privacy Policy</h2>
