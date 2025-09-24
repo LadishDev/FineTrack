@@ -21,8 +21,8 @@ import { useStorage } from './hooks/useStorage';
 // Capacitor Local Notifications
 import { LocalNotifications } from '@capacitor/local-notifications';
 
-// Use VITE_REPO_NAME for GitHub Pages, otherwise default to '/'
-const repoName = import.meta.env.VITE_REPO_NAME;
+// Use VITE_REPO_NAME for GitHub Pages, otherwise fallback to first path segment (for local/dev/gh-pages compatibility)
+const repoName = import.meta.env.VITE_REPO_NAME || window.location.pathname.split('/')[1];
 export const BASE_PATH = repoName ? `/${repoName}/` : '/';
 
 const PRIVACY_ACCEPTED_VERSION_KEY = 'privacyAcceptedVersion';
@@ -260,9 +260,8 @@ const parsePath = (path: string) => {
     'add-suggestion': 'add-suggestion',
   };
 
-  return map.hasOwnProperty(relativePath)
-    ? { view: map[relativePath], category: null }
-    : { view: '404', category: null };
+  // Default to dashboard if not found
+  return { view: map[relativePath] || 'dashboard', category: null };
 };
 
   const initial = parsePath(window.location.pathname);
@@ -333,6 +332,7 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
   setCurrentView(view);
 
   // ------------------ URL handling with BASE_PATH ------------------
+
   const pathMap: Record<string, string> = {
     dashboard: '/',
     add: '/addfine',
@@ -788,12 +788,7 @@ const navigateTo = (view: string, replace = false, category?: string | null) => 
               <TermsAndConditions 
               />
             )}
-            {currentView === '404' && (
-              <NotFound404 
-                goBack={() => window.history.length > 1 ? window.history.back() : navigateTo('dashboard', true)} 
-                goHome={() => navigateTo('dashboard', true)} 
-              />
-            )}
+            {/* No explicit 404 view, fallback is dashboard */}
           </>
         )}
         
