@@ -68,7 +68,7 @@ const PrivacyPolicy: React.FC = () => (
 
         <h2 style={{ fontSize: '1.3rem', marginTop: '2rem', color: '#222' }}>Contact Us</h2>
         <p>
-            If you have any questions about this Privacy Policy, please contact us at [Insert Contact Email].
+            If you have any questions about this Privacy Policy, please contact us at <a href="https://github.com/LadishDev/FineTrack/issues" style={{ color: '#0078d4' }}>Github</a>.
         </p>
     </div>
 );

@@ -56,7 +56,7 @@ const TermsAndConditions: React.FC = () => (
 
         <h2 style={{ fontSize: '1.3rem', marginTop: '1.5rem', color: '#222' }}>8. Contact Us</h2>
         <p>
-            If you have any questions about these Terms and Conditions, please contact us at <a href="mailto:support@finetrack.com" style={{ color: '#0078d4' }}>support@finetrack.com</a>.
+            If you have any questions about these Terms and Conditions, please contact us at <a href="https://github.com/LadishDev/FineTrack/issues" style={{ color: '#0078d4' }}>Github</a>.
         </p>
     </div>
 );
